@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Attendance Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: 'Khmer OS Battambang', Arial, sans-serif; text-align: center; background: #f4f7f9; margin: 0; padding: 20px; }
+        h2 { color: #2c3e50; }
+        #reader { width: 100%; max-width: 400px; margin: 20px auto; border: 5px solid #3498db; border-radius: 15px; background: white; overflow: hidden; }
+        .status-box { padding: 15px; margin: 10px auto; max-width: 400px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 14px; }
+        #location-status { color: #e67e22; font-weight: bold; }
+        .success-msg { color: #27ae60; }
+    </style>
+</head>
+<body>
+
+    <h2>ប្រព័ន្ធស្កេនវត្តមាន (សាលារៀន)</h2>
+    
+    <div id="reader"></div>
+    
+    <div class="status-box">
+        <div id="location-status">កំពុងស្វែងរកទីតាំង GPS...</div>
+        <div id="scan-result" style="margin-top:10px; color: #7f8c8d;">សូមអនុញ្ញាតឱ្យប្រើកាមេរ៉ា និងទីតាំង</div>
+    </div>
+
+    <script>
+        // ១. ដាក់ Link Web App URL របស់អ្នកនៅទីនេះ
+        const WEB_APP_URL = "ដាក់_WEB_APP_URL_https://script.google.com/u/0/home/projects/1O_nLnMNwnmddQh2eugY2ycGS-eNiZom5JLJRQlB7KWKR-NfSSFwVj_11/edit"; 
+        
+        let userLat = "0";
+        let userLon = "0";
+        let scannerStarted = false;
+
+        // ២. មុខងារចាប់ផ្តើមកាមេរ៉ា
+        function startScanner() {
+            if (scannerStarted) return;
+            scannerStarted = true;
+            
+            const html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 } 
+            });
+            
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+
+        // ៣. មុខងារនៅពេលស្កេនជាប់
+        function onScanSuccess(decodedText) {
+            document.getElementById('scan-result').innerHTML = "<b class='success-msg'>កំពុងផ្ញើទិន្នន័យ៖ " + decodedText + "</b>";
+            
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: 'no-cors', // បន្ថែមដើម្បីកុំឱ្យជាប់បញ្ហា CORS
+                body: JSON.stringify({
+                    id: decodedText,
+                    latitude: userLat,
+                    longitude: userLon
+                })
+            })
+            .then(() => {
+                alert("កត់វត្តមានជោគជ័យ!\nID: " + decodedText + "\nទីតាំង: " + userLat + "," + userLon);
+                location.reload();
+            })
+            .catch(err => {
+                alert("មានបញ្ហាផ្ញើទិន្នន័យ៖ " + err);
+            });
+        }
+
+        // ៤. មុខងារឆែក GPS (កំណត់ពេល ៥ វិនាទី)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLat = position.coords.latitude;
+                    userLon = position.coords.longitude;
+                    document.getElementById('location-status').innerHTML = "<span class='success-msg'>ទីតាំង GPS: រួចរាល់</span>";
+                    startScanner();
+                },
+                (error) => {
+                    document.getElementById('location-status').innerText = "មិនអាចចូលប្រើ GPS (ប្រើទីតាំងលំនាំដើម)";
+                    startScanner();
+                },
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
+        } else {
+            document.getElementById('location-status').innerText = "កម្មវិធីរុករកមិនគាំទ្រ GPS";
+            startScanner();
+        }
+    </script>
+</body>
+</html>
