@@ -5,81 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
     <style>
-        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; margin: 0; padding: 20px; }
+        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
         .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { color: #1a73e8; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .staff-list { display: flex; flex-direction: column; gap: 12px; }
-        .staff-btn { 
-            padding: 18px; font-size: 18px; border: none; border-radius: 12px; 
-            background: #ffffff; color: #333; cursor: pointer; transition: 0.3s;
-            border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-align: left; padding-left: 25px;
-        }
-        .staff-btn:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
-        .staff-btn:active { transform: scale(0.98); }
-        #status { margin-top: 25px; font-weight: bold; min-height: 24px; color: #5f6368; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .staff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; font-size: 18px; border-radius: 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+        .staff-btn:hover { background: #e8f0fe; color: #1a73e8; }
+        #status { margin-top: 20px; font-weight: bold; color: #d93025; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>សូមជ្រើសរើសឈ្មោះរបស់អ្នក</h2>
+    <p style="font-size: 12px; color: #666;">(អ្នកអាចចុះវត្តមានបាន លុះត្រាតែស្ថិតក្នុងសាលា)</p>
     <div class="staff-list">
-        <button class="staff-btn" onclick="sendData('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
-        <button class="staff-btn" onclick="sendData('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
-        <button class="staff-btn" onclick="sendData('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
-        <button class="staff-btn" onclick="sendData('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+        <button class="staff-btn" onclick="processAttendance('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
+        <button class="staff-btn" onclick="processAttendance('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
+        <button class="staff-btn" onclick="processAttendance('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
+        <button class="staff-btn" onclick="processAttendance('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
     </div>
     <div id="status"></div>
 </div>
 
 <script>
-    // ដាក់ Web App URL ដែលលោកគ្រូ Copy ពី Google Script ចូលទីនេះ
+    // * ១. ដាក់ Web App URL របស់អ្នក
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-    function sendData(name) {
-        if (!confirm("តើអ្នកពិតជាចង់កត់វត្តមានឈ្មោះ [" + name + "] មែនទេ?")) return;
+    // * ២. ដាក់ទីតាំងសាលារបស់អ្នក (ទាញពី Google Maps)
+    const SCHOOL_LAT = 11.531234; // ឧទាហរណ៍៖ លេខខាងមុខ
+    const SCHOOL_LON = 104.812345; // ឧទាហរណ៍៖ លេខខាងក្រោយ
+    const ALLOWED_DISTANCE = 100; // ចម្ងាយអនុញ្ញាត (គិតជាម៉ែត្រ)
 
+    function processAttendance(name) {
         const statusDiv = document.getElementById('status');
-        statusDiv.innerHTML = '<div class="loader"></div> កំពុងឆែក GPS...';
+        statusDiv.innerText = "កំពុងឆែកទីតាំង...";
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+                const uLat = position.coords.latitude;
+                const uLon = position.coords.longitude;
                 
-                statusDiv.innerHTML = '<div class="loader"></div> កំពុងរក្សាទុកទិន្នន័យ...';
+                // គណនាចម្ងាយពីទូរស័ព្ទមកសាលា
+                const dist = calculateDistance(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
 
-                fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        id: name, 
-                        latitude: lat,
-                        longitude: lon
-                    })
-                })
-                .then(() => {
-                    statusDiv.innerHTML = "<span style='color: #27ae60;'>✔️ កត់វត្តមានជោគជ័យ!</span>";
-                    alert("ជោគជ័យ! សូមអរគុណលោកគ្រូ " + name);
-                    setTimeout(() => { statusDiv.innerHTML = ""; }, 3000);
-                })
-                .catch(err => {
-                    alert("មានបញ្ហា៖ " + err);
-                    statusDiv.innerHTML = "កំហុសបច្ចេកទេស!";
-                });
-
+                if (dist <= ALLOWED_DISTANCE) {
+                    submitData(name, uLat, uLon);
+                } else {
+                    statusDiv.innerHTML = `❌ អ្នកនៅឆ្ងាយពីសាលាពេក (${Math.round(dist)} ម៉ែត្រ)។ <br>សូមមកចុះវត្តមានក្នុងបរិវេណសាលា!`;
+                }
             }, (error) => {
-                alert("សូមបើក GPS (Location) លើទូរស័ព្ទ រួចព្យាយាមម្តងទៀត!");
-                statusDiv.innerHTML = "<span style='color: #d93025;'>កំហុស៖ ត្រូវការ GPS!</span>";
+                alert("សូមបើក GPS!");
             }, { enableHighAccuracy: true });
-        } else {
-            alert("ទូរស័ព្ទរបស់អ្នកមិនគាំទ្រ GPS ទេ!");
         }
     }
-</script>
 
+    // រូបមន្តគណនាចម្ងាយផែនដី (Haversine formula)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // កាំផែនដីជាម៉ែត្រ
+        const p1 = lat1 * Math.PI/180;
+        const p2 = lat2 * Math.PI/180;
+        const dp = (lat2-lat1) * Math.PI/180;
+        const dl = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function submitData(name, lat, lon) {
+        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
+        .then(() => {
+            alert("កត់វត្តមានជោគជ័យសម្រាប់៖ " + name);
+            location.reload();
+        });
+    }
+</script>
 </body>
 </html>
