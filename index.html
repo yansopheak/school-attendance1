@@ -3,66 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ចុះវត្តមានបុគ្គលិក</title>
+    <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
     <style>
-        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5; }
-        .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 2s linear infinite; margin: auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .status { margin-top: 20px; font-weight: bold; color: #2c3e50; }
+        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f4f7f9; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 20px; }
+        .staff-btn { 
+            display: block; width: 100%; padding: 15px; margin: 10px 0; 
+            font-size: 18px; border: none; border-radius: 8px; 
+            background: #3498db; color: white; cursor: pointer; transition: 0.3s;
+        }
+        .staff-btn:hover { background: #2980b9; }
+        #status { margin-top: 20px; font-weight: bold; color: #e67e22; }
     </style>
 </head>
 <body>
 
-    <div id="main-ui">
-        <div class="loader"></div>
-        <div class="status" id="msg">កំពុងផ្ទៀងផ្ទាត់ទីតាំង និងកត់វត្តមាន...</div>
-    </div>
+<div class="container">
+    <h2>សូមជ្រើសរើសឈ្មោះរបស់អ្នក</h2>
+    <div id="staff-list">
+        <button class="staff-btn" onclick="submitAttendance('លោកគ្រូ សូ ធីម')">លោកគ្រូ សូ ធីម</button>
+        <button class="staff-btn" onclick="submitAttendance('លោកគ្រូ មែ រុំ')">លោកគ្រូ មែ រុំ</button>
+        <button class="staff-btn" onclick="submitAttendance('លោកគ្រូ លីវ គីម')">លោកគ្រូ លីវ គីម</button>
+        <button class="staff-btn" onclick="submitAttendance('អ្នកគ្រូ ភត្រា')">អ្នកគ្រូ ភត្រា</button>
+        </div>
+    <div id="status"></div>
+</div>
 
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-        // ចាប់យក ID ពីតំណ Link (ឧទាហរណ៍៖ ?id=T001)
-        const urlParams = new URLSearchParams(window.location.search);
-        const staffId = urlParams.get('id');
+    function submitAttendance(staffName) {
+        if (!confirm("តើអ្នកពិតជាចង់កត់វត្តមានឈ្មោះ " + staffName + " មែនទេ?")) return;
 
-        if (!staffId) {
-            document.getElementById('msg').innerHTML = "<span style='color:red;'>កំហុស៖ រកមិនឃើញអត្តលេខបុគ្គលិក!</span>";
-        } else {
-            checkLocationAndSubmit();
+        document.getElementById('status').innerText = "កំពុងឆែកទីតាំង GPS...";
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                document.getElementById('status').innerText = "កំពុងផ្ញើទិន្នន័យ...";
+
+                fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        id: staffName, // ប្រើឈ្មោះជា ID តែម្តង
+                        latitude: lat,
+                        longitude: lon
+                    })
+                })
+                .then(() => {
+                    alert("កត់វត្តមានជោគជ័យសម្រាប់៖ " + staffName);
+                    document.getElementById('status').innerText = "រួចរាល់!";
+                })
+                .catch(err => alert("កំហុស៖ " + err));
+
+            }, (error) => {
+                alert("សូមបើក GPS ជាមុនសិន!");
+                document.getElementById('status').innerText = "ត្រូវការ GPS ដើម្បីកត់វត្តមាន";
+            });
         }
+    }
+</script>
 
-        function checkLocationAndSubmit() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        submitData(staffId, lat, lon);
-                    },
-                    (error) => {
-                        alert("សូមបើក GPS ជាមុនសិន ទើបអាចចុះវត្តមានបាន!");
-                        document.getElementById('msg').innerText = "សូមបើក GPS រួចព្យាយាមម្តងទៀត";
-                    },
-                    { enableHighAccuracy: true }
-                );
-            }
-        }
-
-        function submitData(id, lat, lon) {
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ id: id, latitude: lat, longitude: lon })
-            })
-            .then(() => {
-                document.getElementById('main-ui').innerHTML = `
-                    <h2 style="color:green;">✔️ កត់វត្តមានជោគជ័យ</h2>
-                    <p>អត្តលេខ៖ ${id}</p>
-                    <p>ម៉ោង៖ ${new Date().toLocaleTimeString()}</p>
-                `;
-            })
-            .catch(err => alert("មានបញ្ហា៖ " + err));
-        }
-    </script>
 </body>
 </html>
