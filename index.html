@@ -3,77 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
+    <title>វត្តមានសាលារៀន</title>
     <style>
         body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
         .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .staff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; font-size: 18px; border-radius: 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
-        .staff-btn:hover { background: #e8f0fe; color: #1a73e8; }
-        #status { margin-top: 20px; font-weight: bold; color: #d93025; }
+        
+        /* ផ្ទាំងរំលឹកពេលបិទ GPS */
+        #gps-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; 
+        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 400px; }
+        .gps-icon { font-size: 50px; color: #d93025; margin-bottom: 15px; }
+        .btn-close { background: #1a73e8; color: white; padding: 12px 25px; border: none; border-radius: 10px; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>សូមជ្រើសរើសឈ្មោះរបស់អ្នក</h2>
-    <p style="font-size: 12px; color: #666;">(អ្នកអាចចុះវត្តមានបាន លុះត្រាតែស្ថិតក្នុងសាលា)</p>
-    <div class="staff-list">
-        <button class="staff-btn" onclick="processAttendance('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
-        <button class="staff-btn" onclick="processAttendance('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
-        <button class="staff-btn" onclick="processAttendance('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
-        <button class="staff-btn" onclick="processAttendance('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+<div id="gps-modal">
+    <div class="modal-content">
+        <div class="gps-icon">📍</div>
+        <h3 style="color: #d93025;">សូមបើក GPS ជាមុនសិន!</h3>
+        <p>ដើម្បីចុះវត្តមានបាន លោកគ្រូអ្នកគ្រូត្រូវ៖</p>
+        <ul style="text-align: left; font-size: 14px;">
+            <li>ទាញអេក្រង់ចុះក្រោម ហើយចុចបើក <b>Location/GPS</b></li>
+            <li>ចុចលើប៊ូតុង <b>"Allow"</b> ឬ <b>"អនុញ្ញាត"</b> បើមានផ្ទាំងសួរ</li>
+        </ul>
+        <button class="btn-close" onclick="closeModal()">យល់ព្រម</button>
     </div>
-    <div id="status"></div>
+</div>
+
+<div class="container">
+    <h2>ចុះវត្តមានបុគ្គលិក</h2>
+    <div class="staff-list">
+        <button class="staff-btn" onclick="checkAndSubmit('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
+        <button class="staff-btn" onclick="checkAndSubmit('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
+        <button class="staff-btn" onclick="checkAndSubmit('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
+        <button class="staff-btn" onclick="checkAndSubmit('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+    </div>
+    <div id="status" style="margin-top: 15px; color: #666;"></div>
 </div>
 
 <script>
-    // * ១. ដាក់ Web App URL របស់អ្នក
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-    // * ២. ដាក់ទីតាំងសាលារបស់អ្នក (ទាញពី Google Maps)
-    const SCHOOL_LAT = 11.531234; // ឧទាហរណ៍៖ លេខខាងមុខ
-    const SCHOOL_LON = 104.812345; // ឧទាហរណ៍៖ លេខខាងក្រោយ
-    const ALLOWED_DISTANCE = 100; // ចម្ងាយអនុញ្ញាត (គិតជាម៉ែត្រ)
-
-    function processAttendance(name) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerText = "កំពុងឆែកទីតាំង...";
-
+    function checkAndSubmit(name) {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const uLat = position.coords.latitude;
-                const uLon = position.coords.longitude;
-                
-                // គណនាចម្ងាយពីទូរស័ព្ទមកសាលា
-                const dist = calculateDistance(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
-
-                if (dist <= ALLOWED_DISTANCE) {
-                    submitData(name, uLat, uLon);
-                } else {
-                    statusDiv.innerHTML = `❌ អ្នកនៅឆ្ងាយពីសាលាពេក (${Math.round(dist)} ម៉ែត្រ)។ <br>សូមមកចុះវត្តមានក្នុងបរិវេណសាលា!`;
-                }
-            }, (error) => {
-                alert("សូមបើក GPS!");
-            }, { enableHighAccuracy: true });
+            // សាកល្បងឆែក GPS
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // បើបើក GPS វានឹងដំណើរការផ្ញើទិន្នន័យ
+                    submitAttendance(name, position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    // បើបិទ GPS ឬមិនព្រមចុច Allow វានឹងលោតផ្ទាំងរំលឹក
+                    document.getElementById('gps-modal').style.display = 'flex';
+                },
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
         }
     }
 
-    // រូបមន្តគណនាចម្ងាយផែនដី (Haversine formula)
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // កាំផែនដីជាម៉ែត្រ
-        const p1 = lat1 * Math.PI/180;
-        const p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180;
-        const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+    function closeModal() {
+        document.getElementById('gps-modal').style.display = 'none';
     }
 
-    function submitData(name, lat, lon) {
-        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
-        .then(() => {
-            alert("កត់វត្តមានជោគជ័យសម្រាប់៖ " + name);
+    function submitAttendance(name, lat, lon) {
+        document.getElementById('status').innerText = "កំពុងរក្សាទុកវត្តមាន...";
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ id: name, latitude: lat, longitude: lon })
+        }).then(() => {
+            alert("ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
             location.reload();
         });
     }
