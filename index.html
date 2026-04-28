@@ -3,61 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>វត្តមានសាលារៀន</title>
+    <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
     <style>
         body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
         .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .staff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; font-size: 18px; border-radius: 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
         
-        /* ផ្ទាំងរំលឹកពេលបិទ GPS */
+        /* ផ្ទាំងរំលឹក និងប៊ូតុងនាំផ្លូវ */
         #gps-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; 
+            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; color: white;
         }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 400px; }
-        .gps-icon { font-size: 50px; color: #d93025; margin-bottom: 15px; }
-        .btn-close { background: #1a73e8; color: white; padding: 12px 25px; border: none; border-radius: 10px; margin-top: 20px; cursor: pointer; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px; color: #333; }
+        .btn-settings { 
+            background: #d93025; color: white; padding: 15px 20px; border: none; 
+            border-radius: 10px; margin-top: 20px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;
+        }
     </style>
 </head>
 <body>
 
 <div id="gps-modal">
     <div class="modal-content">
-        <div class="gps-icon">📍</div>
-        <h3 style="color: #d93025;">សូមបើក GPS ជាមុនសិន!</h3>
-        <p>ដើម្បីចុះវត្តមានបាន លោកគ្រូអ្នកគ្រូត្រូវ៖</p>
-        <ul style="text-align: left; font-size: 14px;">
-            <li>ទាញអេក្រង់ចុះក្រោម ហើយចុចបើក <b>Location/GPS</b></li>
-            <li>ចុចលើប៊ូតុង <b>"Allow"</b> ឬ <b>"អនុញ្ញាត"</b> បើមានផ្ទាំងសួរ</li>
-        </ul>
-        <button class="btn-close" onclick="closeModal()">យល់ព្រម</button>
+        <h2 style="color: #d93025;">📍 បិទ GPS!</h2>
+        <p>ប្រព័ន្ធមិនអាចរកទីតាំងលោកគ្រូអ្នកគ្រូឃើញទេ។ សូមចុចប៊ូតុងខាងក្រោមដើម្បីទៅបើក GPS ក្នុងទូរសព្ទ៖</p>
+        
+        <button class="btn-settings" onclick="openGpsSettings()">⚙️ ទៅកាន់កន្លែងបើក GPS</button>
+        
+        <p style="font-size: 12px; margin-top: 15px; color: #666;">បន្ទាប់ពីបើករួច សូមត្រឡប់មកកាន់ទំព័រនេះវិញ។</p>
     </div>
 </div>
 
 <div class="container">
-    <h2>ចុះវត្តមានបុគ្គលិក</h2>
+    <h2>សូមជ្រើសរើសឈ្មោះរបស់អ្នក</h2>
     <div class="staff-list">
-        <button class="staff-btn" onclick="checkAndSubmit('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
-        <button class="staff-btn" onclick="checkAndSubmit('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
-        <button class="staff-btn" onclick="checkAndSubmit('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
-        <button class="staff-btn" onclick="checkAndSubmit('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+        <button class="staff-btn" onclick="checkAttendance('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
+        <button class="staff-btn" onclick="checkAttendance('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
+        <button class="staff-btn" onclick="checkAttendance('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
+        <button class="staff-btn" onclick="checkAttendance('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
     </div>
-    <div id="status" style="margin-top: 15px; color: #666;"></div>
 </div>
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-    function checkAndSubmit(name) {
+    function checkAttendance(name) {
         if (navigator.geolocation) {
-            // សាកល្បងឆែក GPS
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    // បើបើក GPS វានឹងដំណើរការផ្ញើទិន្នន័យ
-                    submitAttendance(name, position.coords.latitude, position.coords.longitude);
+                    // បើបើករួចហើយ ផ្ញើទិន្នន័យភ្លាម
+                    submitData(name, position.coords.latitude, position.coords.longitude);
                 },
                 (error) => {
-                    // បើបិទ GPS ឬមិនព្រមចុច Allow វានឹងលោតផ្ទាំងរំលឹក
+                    // បើបិទ ឱ្យលោតផ្ទាំងនាំផ្លូវ
                     document.getElementById('gps-modal').style.display = 'flex';
                 },
                 { enableHighAccuracy: true, timeout: 5000 }
@@ -65,18 +63,27 @@
         }
     }
 
-    function closeModal() {
-        document.getElementById('gps-modal').style.display = 'none';
+    function openGpsSettings() {
+        // នេះជាវិធីសាស្ត្រប្រើ Deep Link ដើម្បីបើក Settings (ដើរបានល្អលើ Android មួយចំនួន)
+        if (/Android/i.test(navigator.userAgent)) {
+            // សាកល្បងបើកទំព័រ Location Settings សម្រាប់ Android
+            window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
+        } else {
+            // សម្រាប់ iPhone វានឹងបើក Settings រួម (ព្រោះ Apple រឹតត្បិតខ្លាំង)
+            window.location.href = "App-Prefs:root=Privacy&path=LOCATION";
+            // បើមិនដើរ វានឹងរុញទៅ Settings ធម្មតា
+            setTimeout(() => { window.location.href = "App-Prefs:root=LOCATION_SERVICES"; }, 500);
+        }
     }
 
-    function submitAttendance(name, lat, lon) {
-        document.getElementById('status').innerText = "កំពុងរក្សាទុកវត្តមាន...";
+    function submitData(name, lat, lon) {
+        alert("កំពុងរក្សាទុកវត្តមានសម្រាប់ " + name);
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ id: name, latitude: lat, longitude: lon })
         }).then(() => {
-            alert("ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
+            alert("រួចរាល់!");
             location.reload();
         });
     }
