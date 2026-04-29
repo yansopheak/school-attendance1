@@ -5,88 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
     <style>
-        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
+        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; margin: 0; }
         .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .staff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; font-size: 18px; border-radius: 12px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+        h2 { color: #1a73e8; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
         
-        /* ផ្ទាំងរំលឹក និងប៊ូតុងនាំផ្លូវ */
+        .staff-list { display: flex; flex-direction: column; gap: 12px; }
+        .staff-btn { 
+            padding: 18px; font-size: 18px; border: none; border-radius: 12px; 
+            background: #ffffff; color: #333; cursor: pointer; transition: 0.3s;
+            border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: left; padding-left: 25px;
+        }
+        .staff-btn:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+
+        /* ផ្ទាំងរំលឹកពេលបិទ GPS */
         #gps-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; color: white;
+            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; 
         }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px; color: #333; }
         .btn-settings { 
-            background: #d93025; color: white; padding: 15px 20px; border: none; 
+            background: #d93025; color: white; padding: 15px; border: none; 
             border-radius: 10px; margin-top: 20px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;
         }
+        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
     </style>
 </head>
 <body>
 
 <div id="gps-modal">
     <div class="modal-content">
-        <h2 style="color: #d93025;">📍 បិទ GPS!</h2>
-        <p>ប្រព័ន្ធមិនអាចរកទីតាំងលោកគ្រូអ្នកគ្រូឃើញទេ។ សូមចុចប៊ូតុងខាងក្រោមដើម្បីទៅបើក GPS ក្នុងទូរសព្ទ៖</p>
-        
+        <h2 style="color: #d93025;">📍 មិនទាន់បើក GPS!</h2>
+        <p>លោកគ្រូអ្នកគ្រូត្រូវបើក GPS ជាមុនសិន ទើបអាចចុះវត្តមានបាន។</p>
         <button class="btn-settings" onclick="openGpsSettings()">⚙️ ទៅកាន់កន្លែងបើក GPS</button>
-        
-        <p style="font-size: 12px; margin-top: 15px; color: #666;">បន្ទាប់ពីបើករួច សូមត្រឡប់មកកាន់ទំព័រនេះវិញ។</p>
+        <button style="margin-top:15px; border:none; background:none; color:blue; cursor:pointer;" onclick="location.reload()">បើករួចហើយ ចុចត្រង់នេះដើម្បីសាកល្បងម្ដងទៀត</button>
     </div>
 </div>
 
 <div class="container">
-    <h2>សូមជ្រើសរើសឈ្មោះរបស់អ្នក</h2>
+    <h2>ចុះវត្តមានបុគ្គលិក</h2>
+    <p class="subtitle">សាលាបឋមសិក្សាទួលលៀប</p>
+    
     <div class="staff-list">
-        <button class="staff-btn" onclick="checkAttendance('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
-        <button class="staff-btn" onclick="checkAttendance('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
-        <button class="staff-btn" onclick="checkAttendance('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
-        <button class="staff-btn" onclick="checkAttendance('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+        <button class="staff-btn" onclick="checkLocation('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
+        <button class="staff-btn" onclick="checkLocation('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
+        <button class="staff-btn" onclick="checkLocation('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
+        <button class="staff-btn" onclick="checkLocation('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
     </div>
+    
+    <div id="status"></div>
 </div>
 
 <script>
+    // === ១. កន្លែងដាក់ Link ពី Google Apps Script ===
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-    function checkAttendance(name) {
+    // === ២. កន្លែងកំណត់ទីតាំងសាលា (លោកគ្រូផ្ញើមកមិញ) ===
+    const SCHOOL_LAT = 12.698815661413427; 
+    const SCHOOL_LON = 103.74990933657654; 
+    const MAX_DISTANCE = 100; // ចម្ងាយអនុញ្ញាត ១០០ ម៉ែត្រជុំវិញសាលា
+
+    function checkLocation(name) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerHTML = "កំពុងឆែកទីតាំង...";
+        statusDiv.style.color = "#666";
+
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    // បើបើករួចហើយ ផ្ញើទិន្នន័យភ្លាម
-                    submitData(name, position.coords.latitude, position.coords.longitude);
-                },
-                (error) => {
-                    // បើបិទ ឱ្យលោតផ្ទាំងនាំផ្លូវ
-                    document.getElementById('gps-modal').style.display = 'flex';
-                },
-                { enableHighAccuracy: true, timeout: 5000 }
-            );
+            navigator.geolocation.getCurrentPosition((position) => {
+                const uLat = position.coords.latitude;
+                const uLon = position.coords.longitude;
+                
+                // គណនាចម្ងាយរវាងទូរស័ព្ទ និង សាលា
+                const distance = calculateDistance(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
+
+                if (distance <= MAX_DISTANCE) {
+                    // បើនៅជិតសាលា ឱ្យផ្ញើទិន្នន័យ
+                    submitData(name, uLat, uLon);
+                } else {
+                    // បើនៅឆ្ងាយ ឱ្យលោតសារព្រមាន
+                    statusDiv.innerHTML = `❌ មិនអាចចុះវត្តមានបានទេ! <br>អ្នកនៅឆ្ងាយពីសាលាពេក (${Math.round(distance)} ម៉ែត្រ)។`;
+                    statusDiv.style.color = "red";
+                    alert("អ្នកនៅឆ្ងាយពីសាលាពេក! សូមមកចុះវត្តមានក្នុងបរិវេណសាលា។");
+                }
+            }, (error) => {
+                // បើបិទ GPS ឱ្យលោតផ្ទាំងនាំផ្លូវ
+                document.getElementById('gps-modal').style.display = 'flex';
+            }, { enableHighAccuracy: true });
+        } else {
+            alert("ទូរស័ព្ទរបស់អ្នកមិនគាំទ្រ GPS ឡើយ!");
         }
     }
 
+    // រូបមន្តគណនាចម្ងាយ (Haversine Formula)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // កាំផែនដីជាម៉ែត្រ
+        const p1 = lat1 * Math.PI/180;
+        const p2 = lat2 * Math.PI/180;
+        const dp = (lat2-lat1) * Math.PI/180;
+        const dl = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
     function openGpsSettings() {
-        // នេះជាវិធីសាស្ត្រប្រើ Deep Link ដើម្បីបើក Settings (ដើរបានល្អលើ Android មួយចំនួន)
         if (/Android/i.test(navigator.userAgent)) {
-            // សាកល្បងបើកទំព័រ Location Settings សម្រាប់ Android
             window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
         } else {
-            // សម្រាប់ iPhone វានឹងបើក Settings រួម (ព្រោះ Apple រឹតត្បិតខ្លាំង)
             window.location.href = "App-Prefs:root=Privacy&path=LOCATION";
-            // បើមិនដើរ វានឹងរុញទៅ Settings ធម្មតា
-            setTimeout(() => { window.location.href = "App-Prefs:root=LOCATION_SERVICES"; }, 500);
         }
     }
 
     function submitData(name, lat, lon) {
-        alert("កំពុងរក្សាទុកវត្តមានសម្រាប់ " + name);
+        document.getElementById('status').innerText = "កំពុងរក្សាទុកវត្តមាន...";
+        document.getElementById('status').style.color = "green";
+
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ id: name, latitude: lat, longitude: lon })
         }).then(() => {
-            alert("រួចរាល់!");
+            alert("ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
             location.reload();
+        }).catch(err => {
+            alert("មានបញ្ហាបច្ចេកទេស៖ " + err);
         });
     }
 </script>
+
 </body>
 </html>
