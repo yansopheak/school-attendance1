@@ -6,149 +6,132 @@
     <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --success: #00b894;
-            --danger: #d63031;
-            --dark: #1e272e;
-        }
-
+        :root { --primary: #6c5ce7; --dark: #1e272e; --danger: #d63031; }
         body { 
-            font-family: 'Kantumruy Pro', sans-serif; 
-            margin: 0;
+            font-family: 'Kantumruy Pro', sans-serif; margin: 0;
             background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 15px;
         }
-
         .app-container {
-            width: 100%; max-width: 420px; background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px); border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            overflow: hidden; animation: slideUp 0.6s ease-out;
+            width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.98);
+            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden;
         }
+        .header { background: var(--dark); padding: 30px 15px; color: white; text-align: center; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
+        .header h1 { font-family: 'Moul', cursive; font-size: 17px; margin: 0; color: #fab1a0; line-height: 1.6; }
+        .content { padding: 20px; }
+        .staff-list { display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; padding-right: 5px; }
+        
+        /* កែសម្រួល Scrollbar ឱ្យស្អាត */
+        .staff-list::-webkit-scrollbar { width: 5px; }
+        .staff-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .header {
-            background: var(--dark); padding: 40px 20px; color: white; text-align: center;
-            border-bottom-left-radius: 45px; border-bottom-right-radius: 45px;
+        .staff-card {
+            background: white; border: 2px solid #f1f3f4; border-radius: 20px;
+            display: flex; align-items: center; padding: 10px 15px; cursor: pointer;
+            transition: 0.3s; width: 100%; text-align: left; outline: none;
         }
-
-        .header h1 { font-family: 'Moul', cursive; font-size: 18px; margin: 0; color: #fab1a0; }
-        .header p { margin: 8px 0 0; font-size: 11px; letter-spacing: 1px; font-weight: bold; }
-
-        .content { padding: 25px; }
-
-        .staff-list { display: flex; flex-direction: column; gap: 12px; }
-
-        .staff-btn {
-            background: white; padding: 12px 15px; border-radius: 20px;
-            display: flex; align-items: center; cursor: pointer;
-            transition: 0.3s; border: 2px solid #f1f3f4; width: 100%;
-            text-align: left; outline: none;
+        .staff-card:active { transform: scale(0.96); background: #f8f9fa; }
+        
+        .photo-box {
+            width: 50px; height: 50px; border-radius: 12px; overflow: hidden;
+            margin-right: 15px; background: #e8f0fe; border: 2px solid white;
+            display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
+        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .no-img { font-size: 18px; font-weight: bold; color: var(--primary); }
 
-        .staff-btn:hover { border-color: var(--primary); transform: scale(1.02); }
+        .info { flex: 1; }
+        .name { font-weight: 700; color: var(--dark); font-size: 15px; margin-bottom: 2px; }
+        .role { font-size: 11px; color: #777; background: #f1f3f4; padding: 1px 8px; border-radius: 8px; display: inline-block; }
 
-        .photo-frame {
-            width: 50px; height: 50px; border-radius: 15px; overflow: hidden;
-            margin-right: 15px; background: #eee; border: 2px solid white;
-        }
-
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-
-        .staff-info { flex: 1; }
-        .staff-name { font-weight: 700; color: var(--dark); font-size: 15px; }
-        .staff-role { font-size: 11px; color: #777; }
-
-        #status {
-            margin-top: 20px; padding: 15px; border-radius: 15px;
-            font-size: 13px; font-weight: bold; display: none; text-align: center;
-        }
-
-        #gps-modal {
-            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            z-index: 2000; justify-content: center; align-items: center;
-        }
-        .modal-box { background: white; padding: 30px; border-radius: 30px; width: 80%; text-align: center; }
-        .btn-settings {
-            background: var(--danger); color: white; border: none; padding: 15px;
-            border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 15px;
-        }
+        #status { margin-top: 15px; padding: 15px; border-radius: 12px; font-size: 14px; text-align: center; display: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="gps-modal">
-    <div class="modal-box">
-        <div style="font-size: 50px;">📍</div>
-        <h3 style="color: var(--danger); margin: 10px 0;">GPS មិនទាន់បើក!</h3>
-        <p style="color: #666; font-size: 13px;">សូមបើក GPS ដើម្បីចុះវត្តមាន។</p>
-        <button class="btn-settings" onclick="openGps()">ទៅកាន់ការកំណត់</button>
-    </div>
-</div>
-
 <div class="app-container">
     <div class="header">
         <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <p>DIGITAL ATTENDANCE SYSTEM</p>
+        <p style="font-size: 10px; opacity: 0.8; margin-top: 5px; letter-spacing: 2px;">DIGITAL ATTENDANCE</p>
     </div>
 
     <div class="content">
-        <div class="staff-list">
-            <button class="staff-btn" onclick="checkAttendance('សូ ធីម')">
-                <div class="photo-frame"><img src="https://via.placeholder.com/150" alt="សូ ធីម"></div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ សូ ធីម</div><div class="staff-role">នាយករង</div></div>
-            </button>
-
-            <button class="staff-btn" onclick="checkAttendance('មែ រុំ')">
-                <div class="photo-frame"><img src="https://via.placeholder.com/150" alt="មែ រុំ"></div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ មែ រុំ</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
-            </button>
-
-            <button class="staff-btn" onclick="checkAttendance('លីវ គីម')">
-                <div class="photo-frame"><img src="https://via.placeholder.com/150" alt="លីវ គីម"></div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ លីវ គីម</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
-            </button>
-        </div>
-
+        <div class="staff-list" id="list">
+            </div>
         <div id="status"></div>
     </div>
 </div>
 
 <script>
-    // ១. Link ពី Google Apps Script របស់លោកគ្រូ
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
+    const SCHOOL_LOC = { lat: 12.698815661413427, lon: 103.74990933657654 };
+    const RADIUS = 100;
 
-    // ២. ទីតាំងសាលា
-    const SCHOOL_LAT = 12.698815661413427; 
-    const SCHOOL_LON = 103.74990933657654; 
-    const MAX_DIST = 100;
+    // បញ្ជីឈ្មោះ និង ID រូបភាពពី Google Drive
+    // របៀបដាក់រូបភាព៖ ប្តូរ 'លេខ_ID_រូបភាព' ទៅជា ID ពិតប្រាកដពី Drive របស់លោកគ្រូ
+    const staffData = [
+        { name: "គុំ សុខាន", role: "នាយក", driveId: "លេខ_ID_រូបភាព_សុខាន" },
+        { name: "សូ ធីម", role: "នាយករង", driveId: "លេខ_ID_រូបភាព_សូធីម" },
+        { name: "យ៉ាន សុភ័ក្រ្ត", role: "លេខាធិការ", driveId: "លេខ_ID_រូបភាព_សុភ័ក្រ្ត" },
+        { name: "សំ ស្រីល័ក្ខណ៍", role: "បណ្ណារក្ស", driveId: "លេខ_ID_រូបភាព_ស្រីល័ក្ខណ៍" },
+        { name: "មែ រុំ", role: "គ្រូក្រៅប្រព័ន្ធ", driveId: "លេខ_ID_រូបភាព_មែរុំ" },
+        { name: "កូយ សៅឃី", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "គុច គួយ", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "ផុន នារតី", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "រស់ ស្រីណា", role: "គ្រូមត្តេយ្យ", driveId: "" },
+        { name: "លីវ គីម", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "សាត សៅនឿន", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "សុំ ណារីន", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "ឡូ សេងទ្រី", role: "គ្រូមត្តេយ្យ", driveId: "" },
+        { name: "សូសុជាតា", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ជឿង សំភស្ស", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ឈាវ សុខគុណ", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ទ្រី មុនី", role: "គ្រូកិច្ចសន្យា", driveId: "" }
+    ];
 
-    function checkAttendance(name) {
+    const listContainer = document.getElementById('list');
+
+    staffData.forEach(staff => {
+        // បង្កើត Direct Link ពី Google Drive ID
+        const imgUrl = staff.driveId ? `https://lh3.googleusercontent.com/u/0/d/${staff.driveId}` : "";
+        const initial = staff.name.charAt(0);
+
+        const btn = document.createElement('button');
+        btn.className = 'staff-card';
+        btn.onclick = () => startCheckIn(staff.name);
+        btn.innerHTML = `
+            <div class="photo-box">
+                ${imgUrl ? `<img src="${imgUrl}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+                <div class="no-img" style="${imgUrl ? 'display:none' : 'display:flex'}">${initial}</div>
+            </div>
+            <div class="info">
+                <div class="name">${staff.name}</div>
+                <div class="role">${staff.role}</div>
+            </div>
+        `;
+        listContainer.appendChild(btn);
+    });
+
+    function startCheckIn(staffName) {
         const area = document.getElementById('status');
-        area.style.display = "block";
-        area.style.background = "#f8f9fa";
-        area.innerHTML = "⏳ កំពុងឆែកទីតាំង...";
+        area.style.display = "block"; area.style.background = "#f1f2f6"; area.style.color = "#333";
+        area.innerHTML = `⏳ កំពុងឆែកទីតាំងលោកគ្រូអ្នកគ្រូ ${staffName}...`;
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
-                const dist = calcDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LAT, SCHOOL_LON);
-                if (dist <= MAX_DIST) {
-                    area.innerHTML = "🚀 កំពុងរក្សាទុកវត្តមាន...";
-                    sendData(name, pos.coords.latitude, pos.coords.longitude);
+                const dist = getDistance(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
+                if (dist <= RADIUS) {
+                    area.innerHTML = "🚀 ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុក...";
+                    saveData(staffName, pos.coords.latitude, pos.coords.longitude);
                 } else {
-                    area.innerHTML = `❌ អ្នកនៅឆ្ងាយពេក (${Math.round(dist)}ម)`;
-                    area.style.color = "red";
+                    area.innerHTML = `❌ បដិសេធ! នៅឆ្ងាយសាលាពេក (${Math.round(dist)}ម)`;
+                    area.style.color = "red"; area.style.background = "#ffebee";
                 }
-            }, (err) => {
-                document.getElementById('gps-modal').style.display = 'flex';
-            }, { enableHighAccuracy: true });
+            }, () => alert("សូមបើក GPS ជាមុនសិន!"), { enableHighAccuracy: true });
         }
     }
 
-    function calcDist(lat1, lon1, lat2, lon2) {
+    function getDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
         const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
         const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
@@ -156,16 +139,10 @@
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    function openGps() {
-        window.location.href = /Android/i.test(navigator.userAgent) ? 
-            "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end" : 
-            "App-Prefs:root=Privacy&path=LOCATION";
-    }
-
-    function sendData(name, lat, lon) {
+    function saveData(name, lat, lon) {
         fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
         .then(() => {
-            alert("✅ រួចរាល់! អរគុណលោកគ្រូ " + name);
+            alert("✅ ចុះវត្តមានជោគជ័យ! អរគុណ " + name);
             location.reload();
         });
     }
