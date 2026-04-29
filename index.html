@@ -6,124 +6,34 @@
     <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --royal-blue: #1a2a6c;
-            --gold: #d4af37;
-            --gold-light: #f1c40f;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-        }
-
+        :root { --royal: #1a2a6c; --gold: #d4af37; }
         body { 
-            font-family: 'Kantumruy Pro', sans-serif; 
-            margin: 0;
+            font-family: 'Kantumruy Pro', sans-serif; margin: 0;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-attachment: fixed;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            padding: 20px 15px;
-            overflow: hidden;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
         }
-
-        /* បន្ថែម Texture គ្រាប់ចុចឌីជីថលជុំវិញអេក្រង់ */
-        body::before {
-            content: ""; position: absolute; width: 200%; height: 200%;
-            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 30px 30px; z-index: -1; animation: moveBg 100s linear infinite;
-        }
-
-        @keyframes moveBg { from { transform: translate(0,0); } to { transform: translate(-50%, -50%); } }
-
         .app-container {
-            width: 100%; max-width: 430px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border-radius: 50px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-            overflow: hidden;
-            height: 90vh;
-            display: flex; flex-direction: column;
-            border: 5px solid var(--gold);
-            position: relative;
+            width: 90%; max-width: 420px; background: white;
+            height: 85vh; border-radius: 45px; border: 5px solid var(--gold);
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
-
-        .header {
-            background: var(--royal-blue);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            position: relative;
-            border-bottom: 4px solid var(--gold);
-        }
-
-        /* ភ្ញី Dashboard */
-        .header::after {
-            content: ""; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 4px; background: var(--gold); border-radius: 10px;
-        }
-
-        .header h1 { 
-            font-family: 'Moul', cursive; font-size: 19px; margin: 0; 
-            color: var(--gold-light); text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
-        }
-
-        .header p { 
-            margin: 8px 0 0; font-size: 10px; color: #fff;
-            letter-spacing: 3px; font-weight: bold;
-        }
-
-        .content { 
-            padding: 25px 20px; flex: 1; overflow-y: auto; 
-            background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png');
-        }
-        
-        .content::-webkit-scrollbar { width: 0px; }
-
-        .staff-list { display: flex; flex-direction: column; gap: 15px; }
-
+        .header { background: var(--royal); padding: 35px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .header h1 { font-family: 'Moul'; font-size: 18px; margin: 0; color: #f1c40f; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png'); }
         .staff-card {
-            background: white;
-            border-radius: 20px;
-            display: flex; align-items: center;
-            padding: 12px 15px;
-            cursor: pointer; transition: all 0.3s;
-            text-align: left;
-            /* ស៊ុមជុំវិញឈ្មោះបុគ្គលិក */
-            border: 2px solid #eee;
-            border-left: 6px solid var(--royal-blue);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: white; border-radius: 18px; padding: 12px; margin-bottom: 12px;
+            display: flex; align-items: center; border: 2px solid #eee; border-left: 8px solid var(--royal);
+            cursor: pointer; transition: 0.3s;
         }
-
-        .staff-card:hover {
-            transform: scale(1.02);
-            border-color: var(--gold);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+        .staff-card:hover { transform: scale(1.02); border-color: var(--gold); }
+        .avatar {
+            width: 55px; height: 55px; border-radius: 15px; background: var(--royal);
+            margin-right: 15px; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            color: var(--gold); border: 1px solid var(--gold); flex-shrink: 0;
         }
-
-        .avatar-box {
-            width: 52px; height: 52px; border-radius: 15px;
-            background: var(--royal-blue);
-            display: flex; justify-content: center; align-items: center;
-            margin-right: 15px; font-size: 20px; color: var(--gold);
-            border: 1px solid var(--gold);
-            flex-shrink: 0; overflow: hidden;
-        }
-
-        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .info { flex: 1; }
-        .name { font-weight: 700; color: var(--royal-blue); font-size: 15px; margin-bottom: 2px; }
-        .role { 
-            font-size: 11px; color: #666; 
-            background: #f1f2f6; padding: 1px 10px; border-radius: 10px; display: inline-block;
-        }
-
-        #status-area {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 80%; padding: 18px; border-radius: 25px;
-            backdrop-filter: blur(20px); display: none; text-align: center;
-            font-weight: bold; z-index: 100;
-            border: 2px solid var(--gold);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .info .name { font-weight: bold; color: var(--royal); font-size: 15px; }
+        .info .role { font-size: 11px; color: #666; background: #f0f0f0; padding: 2px 10px; border-radius: 10px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -131,22 +41,15 @@
 <div class="app-container">
     <div class="header">
         <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <p>SMART ATTENDANCE SYSTEM</p>
+        <p style="color:white; font-size:10px; margin-top:5px; letter-spacing:2px;">SMART ATTENDANCE</p>
     </div>
-
-    <div class="content">
-        <div class="staff-list" id="staff-container"></div>
-    </div>
+    <div class="content" id="staff-display"></div>
 </div>
 
-<div id="status-area"></div>
-
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
-    const SCHOOL_LOC = { lat: 12.698815661413427, lon: 103.74990933657654 };
-
+    // របៀបដាក់ ID រូបភាពឱ្យត្រឹមត្រូវ (ដាក់តែលេខ ID បែបនេះប៉ុណ្ណោះ)
     const staffData = [
-        { name: "គុំ សុខាន", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" width="100px">" },
+        { name: "គុំ សុខាន", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
         { name: "សូ ធីម", role: "នាយករង", driveId: "" },
         { name: "យ៉ាន សុភ័ក្រ្ត", role: "លេខាធិការ", driveId: "" },
         { name: "សំ ស្រីល័ក្ខណ៍", role: "បណ្ណារក្ស", driveId: "" },
@@ -165,20 +68,20 @@
         { name: "ទ្រី មុនី", role: "គ្រូកិច្ចសន្យា", driveId: "" }
     ];
 
-    const container = document.getElementById('staff-container');
+    const container = document.getElementById('staff-display');
 
     staffData.forEach(staff => {
         const initial = staff.name.split(' ').pop().charAt(0);
         const card = document.createElement('div');
         card.className = 'staff-card';
-        card.onclick = () => checkIn(staff.name);
         
-        const photoContent = staff.driveId 
+        // ប្រព័ន្ធនឹងទាញរូបភាពពី Google Drive ដោយស្វ័យប្រវត្តិតាមរយៈ ID
+        const photo = staff.driveId 
             ? `<img src="https://lh3.googleusercontent.com/d/${staff.driveId}">` 
             : `<span>${initial}</span>`;
 
         card.innerHTML = `
-            <div class="avatar-box">${photoContent}</div>
+            <div class="avatar">${photo}</div>
             <div class="info">
                 <div class="name">${staff.name}</div>
                 <div class="role">${staff.role}</div>
@@ -186,46 +89,6 @@
         `;
         container.appendChild(card);
     });
-
-    function checkIn(name) {
-        const area = document.getElementById('status-area');
-        area.style.display = "block";
-        area.style.background = "white";
-        area.style.color = "#333";
-        area.innerHTML = "⏳ កំពុងឆែកទីតាំង...";
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const dist = getDistance(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
-                if (dist <= 100) {
-                    area.style.background = "#27ae60";
-                    area.style.color = "white";
-                    area.innerHTML = "✅ ក្នុងសាលា! កំពុងបញ្ជូនទិន្នន័យ...";
-                    saveData(name, pos.coords.latitude, pos.coords.longitude);
-                } else {
-                    area.style.background = "#e74c3c";
-                    area.style.color = "white";
-                    area.innerHTML = `❌ អ្នកនៅឆ្ងាយ (${Math.round(dist)}ម)`;
-                }
-            }, () => alert("សូមបើក GPS!"), { enableHighAccuracy: true });
-        }
-    }
-
-    function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    function saveData(name, lat, lon) {
-        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
-        .then(() => {
-            alert("✅ ចុះវត្តមានជោគជ័យ៖ " + name);
-            location.reload();
-        });
-    }
 </script>
 </body>
 </html>
