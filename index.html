@@ -3,113 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធវត្តមានសាលារៀន</title>
+    <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Khmer OS Battambang', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { color: #1a73e8; margin-bottom: 5px; }
-        .subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
-        
-        .staff-list { display: flex; flex-direction: column; gap: 12px; }
-        .staff-btn { 
-            padding: 18px; font-size: 18px; border: none; border-radius: 12px; 
-            background: #ffffff; color: #333; cursor: pointer; transition: 0.3s;
-            border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-align: left; padding-left: 25px;
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --success: #00b894;
+            --danger: #d63031;
+            --dark: #2d3436;
         }
-        .staff-btn:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
 
-        /* ផ្ទាំងរំលឹកពេលបិទ GPS */
-        #gps-modal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; 
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            margin: 0;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
         }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px; color: #333; }
-        .btn-settings { 
-            background: #d93025; color: white; padding: 15px; border: none; 
-            border-radius: 10px; margin-top: 20px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.2;
+            z-index: -1;
         }
-        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: #1e272e;
+            padding: 40px 20px;
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .header h1 { 
+            font-family: 'Moul', cursive; 
+            font-size: 19px; 
+            margin: 0; 
+            color: #fab1a0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.6;
+        }
+
+        .header p { 
+            margin: 10px 0 0; 
+            font-size: 12px; 
+            opacity: 0.9;
+            letter-spacing: 2px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .content { padding: 30px 20px; }
+
+        .staff-list { display: grid; gap: 15px; }
+
+        .staff-card {
+            background: white;
+            padding: 18px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: #fdfdff;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .staff-info { text-align: left; }
+        .staff-name { font-weight: 700; color: var(--dark); font-size: 16px; }
+        .staff-role { font-size: 11px; color: #636e72; }
+
+        #status-area {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+        }
+
+        #gps-modal {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            z-index: 2000; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: white; padding: 40px 30px; border-radius: 35px;
+            width: 85%; max-width: 340px; text-align: center;
+        }
+        .btn-settings {
+            background: var(--danger); color: white; border: none;
+            padding: 18px; border-radius: 20px; width: 100%;
+            font-weight: bold; font-size: 16px; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(214, 48, 49, 0.3);
+        }
     </style>
 </head>
 <body>
 
 <div id="gps-modal">
-    <div class="modal-content">
-        <h2 style="color: #d93025;">📍 មិនទាន់បើក GPS!</h2>
-        <p>លោកគ្រូអ្នកគ្រូត្រូវបើក GPS ជាមុនសិន ទើបអាចចុះវត្តមានបាន។</p>
-        <button class="btn-settings" onclick="openGpsSettings()">⚙️ ទៅកាន់កន្លែងបើក GPS</button>
-        <button style="margin-top:15px; border:none; background:none; color:blue; cursor:pointer;" onclick="location.reload()">បើករួចហើយ ចុចត្រង់នេះដើម្បីសាកល្បងម្ដងទៀត</button>
+    <div class="modal-box">
+        <div style="font-size: 60px; margin-bottom: 20px;">📍</div>
+        <h2 style="color: var(--danger); margin: 0;">សូមបើក GPS!</h2>
+        <p style="color: #636e72; font-size: 14px; line-height: 1.6; margin: 15px 0 25px;">ដើម្បីចុះវត្តមានបាន លោកគ្រូអ្នកគ្រូត្រូវបើកទីតាំងលើទូរស័ព្ទដៃជាមុនសិន។</p>
+        <button class="btn-settings" onclick="openGps()">⚙️ ទៅកាន់ការកំណត់</button>
     </div>
 </div>
 
-<div class="container">
-    <h2>ចុះវត្តមានបុគ្គលិក</h2>
-    <p class="subtitle">សាលាបឋមសិក្សាទួលលៀប</p>
-    
-    <div class="staff-list">
-        <button class="staff-btn" onclick="checkLocation('សូ ធីម')">👤 លោកគ្រូ សូ ធីម</button>
-        <button class="staff-btn" onclick="checkLocation('មែ រុំ')">👤 លោកគ្រូ មែ រុំ</button>
-        <button class="staff-btn" onclick="checkLocation('លីវ គីម')">👤 លោកគ្រូ លីវ គីម</button>
-        <button class="staff-btn" onclick="checkLocation('យ៉ាន់ សុភ័ក្ត្រ')">👤 លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</button>
+<div class="app-container">
+    <div class="header">
+        <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
+        <p>DIGITAL ATTENDANCE SYSTEM</p>
     </div>
-    
-    <div id="status"></div>
+
+    <div class="content">
+        <div class="staff-list">
+            <div class="staff-card" onclick="runProcess('សូ ធីម')">
+                <div class="avatar">👤</div>
+                <div class="staff-info"><div class="staff-name">លោកគ្រូ សូ ធីម</div><div class="staff-role">នាយករង</div></div>
+            </div>
+            <div class="staff-card" onclick="runProcess('មែ រុំ')">
+                <div class="avatar" style="background: #00cec9;">👤</div>
+                <div class="staff-info"><div class="staff-name">លោកគ្រូ មែ រុំ</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+            </div>
+            <div class="staff-card" onclick="runProcess('លីវ គីម')">
+                <div class="avatar" style="background: #fd79a8;">👤</div>
+                <div class="staff-info"><div class="staff-name">លោកគ្រូ លីវ គីម</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+            </div>
+            <div class="staff-card" onclick="runProcess('យ៉ាន់ សុភ័ក្ត្រ')">
+                <div class="avatar" style="background: #6c5ce7;">👤</div>
+                <div class="staff-info"><div class="staff-name">លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+            </div>
+        </div>
+
+        <div id="status-area"></div>
+    </div>
 </div>
 
 <script>
-    // === ១. កន្លែងដាក់ Link ពី Google Apps Script ===
+    // Link Google Script របស់លោកគ្រូដែលបានផ្ដល់ឱ្យ
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
 
-    // === ២. កន្លែងកំណត់ទីតាំងសាលា (លោកគ្រូផ្ញើមកមិញ) ===
+    // ទីតាំងសាលារបស់លោកគ្រូ
     const SCHOOL_LAT = 12.698815661413427; 
     const SCHOOL_LON = 103.74990933657654; 
-    const MAX_DISTANCE = 100; // ចម្ងាយអនុញ្ញាត ១០០ ម៉ែត្រជុំវិញសាលា
+    const MAX_DIST = 100; // ចម្ងាយអនុញ្ញាត ១០០ ម៉ែត្រ
 
-    function checkLocation(name) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerHTML = "កំពុងឆែកទីតាំង...";
-        statusDiv.style.color = "#666";
+    function runProcess(name) {
+        const area = document.getElementById('status-area');
+        area.style.display = "block";
+        area.style.background = "#f1f2f6";
+        area.style.color = "#333";
+        area.innerHTML = "⏳ កំពុងផ្ទៀងផ្ទាត់ទីតាំង...";
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const uLat = position.coords.latitude;
-                const uLon = position.coords.longitude;
-                
-                // គណនាចម្ងាយរវាងទូរស័ព្ទ និង សាលា
-                const distance = calculateDistance(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const uLat = pos.coords.latitude;
+                const uLon = pos.coords.longitude;
+                const dist = calcDist(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
 
-                if (distance <= MAX_DISTANCE) {
-                    // បើនៅជិតសាលា ឱ្យផ្ញើទិន្នន័យ
-                    submitData(name, uLat, uLon);
+                if (dist <= MAX_DIST) {
+                    area.style.background = "#e1f5fe";
+                    area.innerHTML = "🚀 ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុកវត្តមាន...";
+                    sendData(name, uLat, uLon);
                 } else {
-                    // បើនៅឆ្ងាយ ឱ្យលោតសារព្រមាន
-                    statusDiv.innerHTML = `❌ មិនអាចចុះវត្តមានបានទេ! <br>អ្នកនៅឆ្ងាយពីសាលាពេក (${Math.round(distance)} ម៉ែត្រ)។`;
-                    statusDiv.style.color = "red";
-                    alert("អ្នកនៅឆ្ងាយពីសាលាពេក! សូមមកចុះវត្តមានក្នុងបរិវេណសាលា។");
+                    area.style.background = "#ffebee";
+                    area.style.color = "#d63031";
+                    area.innerHTML = `❌ បដិសេធ! លោកគ្រូនៅឆ្ងាយពីសាលា ${Math.round(dist)} ម៉ែត្រ។`;
                 }
             }, (error) => {
-                // បើបិទ GPS ឱ្យលោតផ្ទាំងនាំផ្លូវ
                 document.getElementById('gps-modal').style.display = 'flex';
             }, { enableHighAccuracy: true });
-        } else {
-            alert("ទូរស័ព្ទរបស់អ្នកមិនគាំទ្រ GPS ឡើយ!");
         }
     }
 
-    // រូបមន្តគណនាចម្ងាយ (Haversine Formula)
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // កាំផែនដីជាម៉ែត្រ
-        const p1 = lat1 * Math.PI/180;
-        const p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180;
-        const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+    function calcDist(lat1, lon1, lat2, lon2) {
+        const R = 6371e3;
+        const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
+        const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    function openGpsSettings() {
+    function openGps() {
         if (/Android/i.test(navigator.userAgent)) {
             window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
         } else {
@@ -117,22 +241,13 @@
         }
     }
 
-    function submitData(name, lat, lon) {
-        document.getElementById('status').innerText = "កំពុងរក្សាទុកវត្តមាន...";
-        document.getElementById('status').style.color = "green";
-
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({ id: name, latitude: lat, longitude: lon })
-        }).then(() => {
-            alert("ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
+    function sendData(name, lat, lon) {
+        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
+        .then(() => {
+            alert("✅ ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
             location.reload();
-        }).catch(err => {
-            alert("មានបញ្ហាបច្ចេកទេស៖ " + err);
-        });
+        }).catch(err => alert("Error: " + err));
     }
 </script>
-
 </body>
 </html>
