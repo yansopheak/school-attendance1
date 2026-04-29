@@ -9,47 +9,45 @@
         :root {
             --primary: #6c5ce7;
             --secondary: #a29bfe;
-            --accent: #fd79a8;
             --success: #00b894;
             --danger: #d63031;
-            --dark: #2d3436;
+            --bg-color: #f0f2f5;
+            --text-dark: #2d3436;
         }
 
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
             margin: 0;
-            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            background-color: var(--bg-color);
+            background-image: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
-            position: relative;
+            padding: 15px;
         }
 
+        /* Cubes Pattern សម្រាប់ផ្ទៃក្រោយ */
         body::before {
             content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; width: 100%; height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
-            opacity: 0.2;
-            z-index: -1;
+            opacity: 0.15; z-index: -1;
         }
 
         .app-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 430px;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             border-radius: 40px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            animation: slideUp 0.8s ease-out;
-            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeIn 0.8s ease-out;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -60,7 +58,7 @@
             text-align: center;
             border-bottom-left-radius: 50px;
             border-bottom-right-radius: 50px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
         .header h1 { 
@@ -68,59 +66,74 @@
             font-size: 19px; 
             margin: 0; 
             color: #fab1a0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             line-height: 1.6;
         }
 
         .header p { 
-            margin: 10px 0 0; 
+            margin: 8px 0 0; 
             font-size: 12px; 
-            opacity: 0.9;
             letter-spacing: 2px;
             font-weight: bold;
-            color: #ffffff;
+            text-transform: uppercase;
         }
 
         .content { padding: 30px 20px; }
 
+        .welcome-msg {
+            text-align: center; margin-bottom: 25px;
+        }
+        .welcome-msg h2 { margin: 0; font-size: 20px; color: var(--primary); }
+        .welcome-msg p { margin: 5px 0 0; font-size: 13px; color: #636e72; }
+
         .staff-list { display: grid; gap: 15px; }
 
-        .staff-card {
+        .staff-btn {
             background: white;
-            padding: 18px;
-            border-radius: 22px;
+            padding: 15px 20px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 2px solid transparent;
+            border: 2px solid #eef1f5;
         }
 
-        .staff-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            background: #fdfdff;
+        .staff-btn:hover {
+            transform: translateY(-4px);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.15);
         }
 
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            margin-right: 15px;
+        /* តំបន់រូបថត */
+        .photo-frame {
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+            overflow: hidden; /* កាត់ឱ្យមូល */
+            margin-right: 18px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        .staff-info { text-align: left; }
-        .staff-name { font-weight: 700; color: var(--dark); font-size: 16px; }
-        .staff-role { font-size: 11px; color: #636e72; }
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ពង្រីកឱ្យពេញប្រអប់ */
+        }
 
-        #status-area {
+        .no-photo {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 24px; font-weight: bold;
+        }
+
+        .staff-info { text-align: left; flex: 1; }
+        .staff-name { font-weight: 700; color: var(--text-dark); font-size: 16px; margin-bottom: 3px; }
+        .staff-role { font-size: 11px; color: #636e72; background: #eef1f5; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+
+        #status {
             margin-top: 25px;
             padding: 15px;
             border-radius: 15px;
@@ -130,6 +143,7 @@
             text-align: center;
         }
 
+        /* GPS Modal */
         #gps-modal {
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -137,13 +151,16 @@
         }
         .modal-box {
             background: white; padding: 40px 30px; border-radius: 35px;
-            width: 85%; max-width: 340px; text-align: center;
+            width: 80%; max-width: 320px; text-align: center;
         }
-        .btn-settings {
+        .gps-icon { font-size: 60px; margin-bottom: 15px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .btn-open-settings {
             background: var(--danger); color: white; border: none;
-            padding: 18px; border-radius: 20px; width: 100%;
+            padding: 16px 25px; border-radius: 50px; width: 100%;
             font-weight: bold; font-size: 16px; cursor: pointer;
             box-shadow: 0 10px 20px rgba(214, 48, 49, 0.3);
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -151,89 +168,113 @@
 
 <div id="gps-modal">
     <div class="modal-box">
-        <div style="font-size: 60px; margin-bottom: 20px;">📍</div>
-        <h2 style="color: var(--danger); margin: 0;">សូមបើក GPS!</h2>
-        <p style="color: #636e72; font-size: 14px; line-height: 1.6; margin: 15px 0 25px;">ដើម្បីចុះវត្តមានបាន លោកគ្រូអ្នកគ្រូត្រូវបើកទីតាំងលើទូរស័ព្ទដៃជាមុនសិន។</p>
-        <button class="btn-settings" onclick="openGps()">⚙️ ទៅកាន់ការកំណត់</button>
+        <div class="gps-icon">📍</div>
+        <h2 style="color: var(--danger); margin: 0;">GPS មិនទាន់បើក!</h2>
+        <p style="color: #636e72; font-size: 14px; line-height: 1.6; margin: 15px 0;">សុំទោស! លោកគ្រូអ្នកគ្រូត្រូវបើកទីតាំង (GPS) ជាមុនសិន ទើបអាចចុះវត្តមានក្នុងបរិវេណសាលាបាន។</p>
+        <button class="btn-open-settings" onclick="gotoSettings()">ទៅកាន់កន្លែងបើក GPS</button>
     </div>
 </div>
 
 <div class="app-container">
     <div class="header">
         <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <p>DIGITAL ATTENDANCE SYSTEM</p>
+        <p>ប្រព័ន្ធវត្តមានឌីជីថល</p>
     </div>
 
     <div class="content">
+        <div class="welcome-msg">
+            <h2>ជម្រាបសួរ!</h2>
+            <p>សូមជ្រើសរើសឈ្មោះ ដើម្បីកត់វត្តមានចូលការងារ</p>
+        </div>
+
         <div class="staff-list">
-            <div class="staff-card" onclick="runProcess('សូ ធីម')">
-                <div class="avatar">👤</div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ សូ ធីម</div><div class="staff-role">នាយករង</div></div>
+            <div class="staff-btn" onclick="checkIn('សូ ធីម')">
+                <div class="photo-frame">
+                    <img src="https://img.freepik.com/premium-photo/portrait-mature-asian-man-teacher-wearing-shirt_251136-1699.jpg" alt="សូ ធីម">
+                </div>
+                <div class="staff-info">
+                    <div class="staff-name">លោកគ្រូ សូ ធីម</div>
+                    <div class="staff-role">នាយករង</div>
+                </div>
             </div>
-            <div class="staff-card" onclick="runProcess('មែ រុំ')">
-                <div class="avatar" style="background: #00cec9;">👤</div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ មែ រុំ</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+
+            <div class="staff-btn" onclick="checkIn('មែ រុំ')">
+                <div class="photo-frame">
+                    <img src="https://images.sampletemplates.com/wp-content/uploads/2016/11/Student-Employee-ID-Card.jpg" alt="មែ រុំ">
+                </div>
+                <div class="staff-info">
+                    <div class="staff-name">លោកគ្រូ មែ រុំ</div>
+                    <div class="staff-role">បុគ្គលិកអប់រំ</div>
+                </div>
             </div>
-            <div class="staff-card" onclick="runProcess('លីវ គីម')">
-                <div class="avatar" style="background: #fd79a8;">👤</div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ លីវ គីម</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+
+            <div class="staff-btn" onclick="checkIn('លីវ គីម')">
+                <div class="photo-frame">
+                    <div class="no-photo">L</div>
+                </div>
+                <div class="staff-info">
+                    <div class="staff-name">លោកគ្រូ លីវ គីម</div>
+                    <div class="staff-role">បុគ្គលិកអប់រំ</div>
+                </div>
             </div>
-            <div class="staff-card" onclick="runProcess('យ៉ាន់ សុភ័ក្ត្រ')">
-                <div class="avatar" style="background: #6c5ce7;">👤</div>
-                <div class="staff-info"><div class="staff-name">លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</div><div class="staff-role">បុគ្គលិកអប់រំ</div></div>
+
+            <div class="staff-btn" onclick="checkIn('យ៉ាន់ សុភ័ក្ត្រ')">
+                <div class="photo-frame">
+                    <div class="no-photo">Y</div>
+                </div>
+                <div class="staff-info">
+                    <div class="staff-name">លោកគ្រូ យ៉ាន់ សុភ័ក្ត្រ</div>
+                    <div class="staff-role">បុគ្គលិកអប់រំ</div>
+                </div>
             </div>
         </div>
 
-        <div id="status-area"></div>
+        <div id="status"></div>
     </div>
 </div>
 
 <script>
-    // Link Google Script របស់លោកគ្រូដែលបានផ្ដល់ឱ្យ
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec"; 
+    const SHOOL_LOCATION = { lat: 12.698815661413427, lon: 103.74990933657654 };
+    const MAX_ALLOWED_DISTANCE_METERS = 100; // ចម្ងាយអនុញ្ញាត ១០០ ម៉ែត្រ
 
-    // ទីតាំងសាលារបស់លោកគ្រូ
-    const SCHOOL_LAT = 12.698815661413427; 
-    const SCHOOL_LON = 103.74990933657654; 
-    const MAX_DIST = 100; // ចម្ងាយអនុញ្ញាត ១០០ ម៉ែត្រ
-
-    function runProcess(name) {
-        const area = document.getElementById('status-area');
+    function checkIn(name) {
+        const area = document.getElementById('status');
         area.style.display = "block";
         area.style.background = "#f1f2f6";
-        area.style.color = "#333";
-        area.innerHTML = "⏳ កំពុងផ្ទៀងផ្ទាត់ទីតាំង...";
+        area.style.color = "#2d3436";
+        area.innerHTML = "⏳ កំពុងផ្ទៀងផ្ទាត់ទីតាំងរបស់លោកគ្រូ...";
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
                 const uLat = pos.coords.latitude;
                 const uLon = pos.coords.longitude;
-                const dist = calcDist(uLat, uLon, SCHOOL_LAT, SCHOOL_LON);
+                const dist = calcDistance(uLat, uLon, SHOOL_LOCATION.lat, SHOOL_LOCATION.lon);
 
-                if (dist <= MAX_DIST) {
+                if (dist <= MAX_ALLOWED_DISTANCE_METERS) {
                     area.style.background = "#e1f5fe";
                     area.innerHTML = "🚀 ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុកវត្តមាន...";
-                    sendData(name, uLat, uLon);
+                    saveDataToSheets(name, uLat, uLon);
                 } else {
                     area.style.background = "#ffebee";
-                    area.style.color = "#d63031";
+                    area.style.color = var(--danger);
                     area.innerHTML = `❌ បដិសេធ! លោកគ្រូនៅឆ្ងាយពីសាលា ${Math.round(dist)} ម៉ែត្រ។`;
                 }
-            }, (error) => {
+            }, () => {
                 document.getElementById('gps-modal').style.display = 'flex';
             }, { enableHighAccuracy: true });
         }
     }
 
-    function calcDist(lat1, lon1, lat2, lon2) {
+    function calcDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
-        const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+        const dLat = (lat2-lat1) * Math.PI/180;
+        const dLon = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    function openGps() {
+    function gotoSettings() {
         if (/Android/i.test(navigator.userAgent)) {
             window.location.href = "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end";
         } else {
@@ -241,13 +282,19 @@
         }
     }
 
-    function sendData(name, lat, lon) {
-        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ id: name, latitude: lat, longitude: lon }) })
-        .then(() => {
-            alert("✅ ជោគជ័យ! លោកគ្រូ " + name + " បានចុះវត្តមានរួចរាល់។");
+    function saveDataToSheets(name, lat, lon) {
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ id: name, latitude: lat, longitude: lon })
+        }).then(() => {
+            alert("✅ រួចរាល់! សូមអរគុណលោកគ្រូ " + name);
             location.reload();
-        }).catch(err => alert("Error: " + err));
+        }).catch(err => {
+            alert("Error saving data: " + err);
+        });
     }
 </script>
+
 </body>
 </html>
