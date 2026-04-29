@@ -6,133 +6,150 @@
     <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <style>
-        :root { --royal: #1a2a6c; --gold: #d4af37; }
+        :root { --royal: #1a2a6c; --gold: #d4af37; --glass: rgba(255, 255, 255, 0.9); }
         body { 
             font-family: 'Kantumruy Pro', sans-serif; margin: 0;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh; display: flex; justify-content: center; align-items: center;
         }
         .app-container {
-            width: 95%; max-width: 420px; background: white;
-            height: 90vh; border-radius: 40px; border: 5px solid var(--gold);
-            display: flex; flex-direction: column; overflow: hidden; position: relative;
+            width: 95%; max-width: 420px; background: var(--glass);
+            height: 90vh; border-radius: 40px; border: 4px solid var(--gold);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
         }
         .header { background: var(--royal); padding: 30px 15px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .header h1 { font-family: 'Moul'; font-size: 18px; margin: 0; color: #f1c40f; }
+        .header h1 { font-family: 'Moul'; font-size: 19px; margin: 0; color: #f1c40f; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
         .content { 
-            flex: 1; padding: 15px; overflow-y: auto; 
+            flex: 1; padding: 20px; overflow-y: auto; 
             background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png'); 
         }
+
+        /* បន្ថែមស៊ុម និងចលនាពេលចុះលើ Card */
         .staff-card {
-            background: white; border-radius: 15px; padding: 12px; margin-bottom: 12px;
-            display: flex; align-items: center; border: 1px solid #ddd; border-left: 8px solid var(--royal);
-            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: white; border-radius: 20px; padding: 12px; margin-bottom: 15px;
+            display: flex; align-items: center; border: 2px solid #eee;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; position: relative; overflow: hidden;
         }
+        
+        /* ចលនាពេលយកដៃប៉ះ ឬ Hover */
+        .staff-card:active { transform: scale(0.95); background: #f0f0f0; }
+        .staff-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3); }
+
         .avatar {
-            width: 55px; height: 55px; border-radius: 12px; background: #eee;
-            margin-right: 15px; overflow: hidden; display: flex; justify-content: center; align-items: center;
-            border: 1px solid var(--gold); flex-shrink: 0;
+            width: 60px; height: 60px; border-radius: 15px; background: var(--royal);
+            margin-right: 18px; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            border: 2px solid var(--gold); box-shadow: 0 3px 10px rgba(0,0,0,0.2); flex-shrink: 0;
         }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .info .name { font-weight: bold; color: var(--royal); font-size: 16px; }
-        .info .role { font-size: 12px; color: #666; background: #f0f0f0; padding: 2px 8px; border-radius: 8px; }
-        #status {
-            position: fixed; top: 10px; width: 80%; max-width: 300px; padding: 15px;
-            border-radius: 20px; display: none; text-align: center; font-weight: bold; z-index: 999;
+        .avatar span { color: var(--gold); font-weight: bold; font-size: 20px; }
+
+        .info .name { font-weight: bold; color: var(--royal); font-size: 17px; margin-bottom: 4px; }
+        .info .role { font-size: 11px; color: #555; background: #e8ebf5; padding: 3px 12px; border-radius: 12px; border: 1px solid #cdd4ea; }
+
+        /* សារបង្ហាញស្ថានភាព */
+        #status-box {
+            position: fixed; top: 20px; width: 85%; max-width: 350px; padding: 15px;
+            border-radius: 25px; display: none; text-align: center; font-weight: bold; z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid white;
         }
     </style>
 </head>
 <body>
 
-<div id="status"></div>
+<div id="status-box"></div>
 
 <div class="app-container">
     <div class="header">
         <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <p style="color:white; font-size:10px; margin:5px 0 0 0;">DIGITAL CHECK-IN</p>
+        <p style="color:white; font-size:10px; margin-top:8px; letter-spacing:2px; font-weight:bold;">SMART ATTENDANCE SYSTEM</p>
     </div>
-    <div class="content" id="list"></div>
+    <div class="content" id="staff-list"></div>
 </div>
 
 <script>
-    // Link ទៅកាន់ Google Sheet របស់លោកគ្រូ
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
-    const SCHOOL = { lat: 12.6988, lon: 103.7499 };
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
+    const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
     const staffData = [
-        { name: "គុំ សុខាន", role: "នាយក", id: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
-        { name: "សូ ធីម", role: "នាយករង", id: "" },
-        { name: "យ៉ាន សុភ័ក្រ្ត", role: "លេខាធិការ", id: "" },
-        { name: "សំ ស្រីល័ក្ខណ៍", role: "បណ្ណារក្ស", id: "" },
-        { name: "មែ រុំ", role: "គ្រូក្រៅប្រព័ន្ធ", id: "" },
-        { name: "កូយ សៅឃី", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "គុច គួយ", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "ផុន នារតី", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "រស់ ស្រីណា", role: "គ្រូមត្តេយ្យ", id: "" },
-        { name: "លីវ គីម", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "សាត សៅនឿន", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "សុំ ណារីន", role: "គ្រូឈរថ្នាក់", id: "" },
-        { name: "ឡូ សេងទ្រី", role: "គ្រូមត្តេយ្យ", id: "" },
-        { name: "សូសុជាតា", role: "គ្រូកិច្ចសន្យា", id: "" },
-        { name: "ជឿង សំភស្ស", role: "គ្រូកិច្ចសន្យា", id: "" },
-        { name: "ឈាវ សុខគុណ", role: "គ្រូកិច្ចសន្យា", id: "" },
-        { name: "ទ្រី មុនី", role: "គ្រូកិច្ចសន្យា", id: "" }
+        { name: "គុំ សុខាន", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
+        { name: "សូ ធីម", role: "នាយករង", driveId: "" },
+        { name: "យ៉ាន សុភ័ក្រ្ត", role: "លេខាធិការ", driveId: "" },
+        { name: "សំ ស្រីល័ក្ខណ៍", role: "បណ្ណារក្ស", driveId: "" },
+        { name: "មែ រុំ", role: "គ្រូក្រៅប្រព័ន្ធ", driveId: "" },
+        { name: "កូយ សៅឃី", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "គុច គួយ", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "ផុន នារតី", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "រស់ ស្រីណា", role: "គ្រូមត្តេយ្យ", driveId: "" },
+        { name: "លីវ គីម", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "សាត សៅនឿន", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "សុំ ណារីន", role: "គ្រូឈរថ្នាក់", driveId: "" },
+        { name: "ឡូ សេងទ្រី", role: "គ្រូមត្តេយ្យ", driveId: "" },
+        { name: "សូសុជាតា", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ជឿង សំភស្ស", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ឈាវ សុខគុណ", role: "គ្រូកិច្ចសន្យា", driveId: "" },
+        { name: "ទ្រី មុនី", role: "គ្រូកិច្ចសន្យា", driveId: "" }
     ];
 
-    const listDiv = document.getElementById('list');
+    const listContainer = document.getElementById('staff-list');
 
-    staffData.forEach(s => {
+    staffData.forEach(staff => {
         const card = document.createElement('div');
         card.className = 'staff-card';
-        card.onclick = () => checkIn(s.name);
+        card.onclick = () => doCheckIn(staff.name);
         
-        // ប្តូរ Link រូបភាពឱ្យងាយស្រួលបំផុត
-        const imgHtml = s.id 
-            ? `<img src="https://lh3.googleusercontent.com/d/${s.id}">` 
-            : `<span style="font-weight:bold; color:#1a2a6c">${s.name.charAt(0)}</span>`;
+        const photo = staff.driveId 
+            ? `<img src="https://lh3.googleusercontent.com/d/${staff.driveId}">` 
+            : `<span>${staff.name.charAt(0)}</span>`;
 
         card.innerHTML = `
-            <div class="avatar">${imgHtml}</div>
+            <div class="avatar">${photo}</div>
             <div class="info">
-                <div class="name">${s.name}</div>
-                <div class="role">${s.role}</div>
+                <div class="name">${staff.name}</div>
+                <div class="role">${staff.role}</div>
             </div>
         `;
-        listDiv.appendChild(card);
+        listContainer.appendChild(card);
     });
 
-    function checkIn(name) {
-        const st = document.getElementById('status');
-        st.style.display = "block";
-        st.style.background = "white";
-        st.style.color = "#333";
-        st.innerHTML = "⏳ កំពុងពិនិត្យទីតាំង...";
+    function doCheckIn(name) {
+        const box = document.getElementById('status-box');
+        box.style.display = "block";
+        box.style.background = "white";
+        box.style.color = "#333";
+        box.innerHTML = "⏳ កំពុងផ្ទៀងផ្ទាត់ទីតាំង...";
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
-                const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL.lat, SCHOOL.lon);
-                if (d <= 500) { // បើកឱ្យដល់ ៥០០ម៉ែត្រ ដើម្បីងាយស្រួលតេស្ត
-                    st.style.background = "#27ae60";
-                    st.style.color = "white";
-                    st.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងបញ្ជូន...";
-                    fetch(SHEET_URL, {
+                const dist = calculateDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
+                if (dist <= 300) { 
+                    box.style.background = "#27ae60";
+                    box.style.color = "white";
+                    box.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងបញ្ជូនវត្តមាន...";
+                    
+                    fetch(WEB_APP_URL, {
                         method: "POST",
                         mode: "no-cors",
                         body: JSON.stringify({ id: name, latitude: pos.coords.latitude, longitude: pos.coords.longitude })
                     }).then(() => {
-                        alert("ជោគជ័យ! បានចុះវត្តមានសម្រាប់៖ " + name);
-                        location.reload();
+                        setTimeout(() => {
+                            alert("សូមអបអរសាទរ! លោកគ្រូ/អ្នកគ្រូ " + name + " បានចុះវត្តមានជោគជ័យ។");
+                            location.reload();
+                        }, 500);
                     });
                 } else {
-                    st.style.background = "#e74c3c";
-                    st.style.color = "white";
-                    st.innerHTML = `❌ នៅឆ្ងាយពេក (${Math.round(d)}ម)`;
+                    box.style.background = "#e74c3c";
+                    box.style.color = "white";
+                    box.innerHTML = `❌ អ្នកនៅក្រៅសាលា (${Math.round(dist)}ម)`;
                 }
             }, () => alert("សូមបើក GPS!"));
         }
     }
 
-    function getDist(lat1, lon1, lat2, lon2) {
+    function calculateDist(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
         const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
         const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
