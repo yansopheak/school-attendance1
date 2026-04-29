@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* --- រក្សាសោភ័ណភាពចាស់របស់លោកគ្រូទាំងស្រុង --- */
         :root { 
             --sky-blue: #00a8ff;
             --deep-sky: #0097e6;
@@ -25,7 +26,6 @@
             min-height: 100vh; overflow: hidden; position: relative;
         }
 
-        /* --- បន្ថែម៖ ចលនាគ្រាប់ពេជ្រអណ្តែត (Diamond Animation) --- */
         #diamond-container {
             position: absolute; width: 100%; height: 100%;
             top: 0; left: 0; z-index: 0; pointer-events: none;
@@ -44,21 +44,6 @@
             10% { opacity: 0.6; }
             90% { opacity: 0.6; }
             100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-        }
-
-        /* ចលនាពពកអណ្តែតនៅ Background */
-        body::before, body::after {
-            content: ""; position: absolute; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            filter: blur(50px); z-index: 0;
-            animation: float 20s infinite alternate ease-in-out;
-        }
-        body::before { width: 300px; height: 300px; top: -10%; left: -10%; }
-        body::after { width: 250px; height: 250px; bottom: -5%; right: -5%; animation-delay: -10s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 100px) scale(1.2); }
         }
 
         .app-container {
@@ -83,9 +68,6 @@
             background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png');
         }
 
-        .content::-webkit-scrollbar { width: 0px; }
-
-        /* Card បុគ្គលិក បែបខៀវស្រាល និងតូចសមសួន */
         .staff-card {
             background: white; border-radius: 15px; padding: 10px 15px; margin-bottom: 12px;
             display: flex; align-items: center;
@@ -99,15 +81,6 @@
 
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-        .staff-card:hover {
-            transform: scale(1.03) translateX(5px);
-            border-color: var(--sky-blue);
-            box-shadow: 0 10px 20px rgba(0, 168, 255, 0.15);
-            background: #f0fbff;
-        }
-
-        .staff-card:active { transform: scale(0.95); }
-
         .avatar {
             width: 50px; height: 50px; border-radius: 12px; background: var(--soft-sky);
             margin-right: 15px; overflow: hidden; display: flex; 
@@ -116,33 +89,20 @@
         }
 
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar span { color: var(--professional-blue); font-weight: bold; font-size: 20px; }
-
-        .info .name { font-weight: 700; color: #2d3436; font-size: 16px; margin-bottom: 2px; }
-        .info .role { 
-            font-size: 10px; color: var(--professional-blue); 
-            background: rgba(30, 55, 153, 0.08); padding: 2px 10px; 
-            border-radius: 10px; font-weight: 600;
-        }
+        .info .name { font-weight: 700; color: #2d3436; font-size: 16px; }
+        .info .role { font-size: 10px; color: var(--professional-blue); background: rgba(30, 55, 153, 0.08); padding: 2px 10px; border-radius: 10px; font-weight: 600; }
 
         #status-bar {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 80%; padding: 15px; border-radius: 25px; display: none;
             text-align: center; font-weight: bold; z-index: 1000;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2); animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.05); }
-            100% { transform: translateX(-50%) scale(1); }
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
 <div id="diamond-container"></div>
-
 <div id="status-bar"></div>
 
 <div class="app-container">
@@ -154,7 +114,6 @@
 </div>
 
 <script>
-    // --- បន្ថែម៖ Function បង្បង្កើតគ្រាប់ពេជ្រអណ្តែត ---
     function createDiamonds() {
         const container = document.getElementById('diamond-container');
         for (let i = 0; i < 25; i++) {
@@ -169,9 +128,9 @@
             container.appendChild(diamond);
         }
     }
-    createDiamonds(); 
+    createDiamonds();
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbzjsYcS_iYmu0rOD1oS845wI1hQhyaocXnQ8IvGcmTUrcFk2uRiUTIjwlbbGzWrr0qc/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
     const staffData = [
@@ -200,7 +159,6 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.08}s`;
-        // កែសម្រួល៖ បញ្ជូនទាំង name និង role ទៅកាន់ function
         card.onclick = () => submitAttendance(s.name, s.role);
         
         const photo = s.driveId 
@@ -217,8 +175,16 @@
         listDiv.appendChild(card);
     });
 
-    // កែសម្រួល៖ ថែម parameter 'role' ក្នុង function
     function submitAttendance(name, role) {
+        // --- បន្ថែមថ្មី៖ ឆែកមើលក្នុងទូរស័ព្ទថាបានចុះថ្ងៃនេះហើយឬនៅ ---
+        const today = new Date().toDateString();
+        const lastCheck = localStorage.getItem('attendance_' + name);
+
+        if (lastCheck === today) {
+            alert("❌ លោកគ្រូ/អ្នកគ្រូ " + name + " បានចុះវត្តមានសម្រាប់ថ្ងៃនេះរួចរាល់ហើយ!");
+            return;
+        }
+
         const bar = document.getElementById('status-bar');
         bar.style.display = "block";
         bar.style.background = "white";
@@ -231,12 +197,11 @@
                 if (d <= 300) {
                     bar.style.background = "#27ae60";
                     bar.style.color = "white";
-                    bar.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុក...";
-                    
+                    bar.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងផ្ទៀងផ្ទាត់ឈ្មោះស្ទួន...";
+
                     fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
-                        // កែសម្រួល៖ បញ្ជូន data 'role' ទៅក្នុង JSON
                         body: JSON.stringify({ 
                             id: name, 
                             role: role, 
@@ -244,6 +209,9 @@
                             longitude: pos.coords.longitude 
                         })
                     }).then(() => {
+                        // --- បន្ថែមថ្មី៖ កត់ចំណាំទុកក្នុងទូរស័ព្ទបន្ទាប់ពីផ្ញើជោគជ័យ ---
+                        localStorage.setItem('attendance_' + name, today);
+                        
                         setTimeout(() => {
                             alert("✅ ជោគជ័យ! " + name + " (" + role + ") បានចុះវត្តមានរួចរាល់។");
                             location.reload();
