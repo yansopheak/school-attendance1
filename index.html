@@ -25,6 +25,27 @@
             min-height: 100vh; overflow: hidden; position: relative;
         }
 
+        /* --- បន្ថែម៖ ចលនាគ្រាប់ពេជ្រអណ្តែត (Diamond Animation) --- */
+        #diamond-container {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; z-index: 0; pointer-events: none;
+        }
+
+        .diamond-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: diamondMove 15s infinite linear;
+            opacity: 0;
+        }
+
+        @keyframes diamondMove {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
         /* ចលនាពពកអណ្តែតនៅ Background */
         body::before, body::after {
             content: ""; position: absolute; border-radius: 50%;
@@ -120,6 +141,8 @@
 </head>
 <body>
 
+<div id="diamond-container"></div>
+
 <div id="status-bar"></div>
 
 <div class="app-container">
@@ -131,6 +154,23 @@
 </div>
 
 <script>
+    // --- បន្ថែម៖ Function បង្កើតគ្រាប់ពេជ្រអណ្តែត ---
+    function createDiamonds() {
+        const container = document.getElementById('diamond-container');
+        for (let i = 0; i < 25; i++) {
+            const diamond = document.createElement('div');
+            diamond.className = 'diamond-particle';
+            const size = Math.random() * 15 + 5;
+            diamond.style.width = `${size}px`;
+            diamond.style.height = `${size}px`;
+            diamond.style.left = `${Math.random() * 100}vw`;
+            diamond.style.animationDelay = `${Math.random() * 15}s`;
+            diamond.style.animationDuration = `${Math.random() * 10 + 10}s`;
+            container.appendChild(diamond);
+        }
+    }
+    createDiamonds(); // ហៅមកប្រើ
+
     // Link ទៅកាន់ Google Script លោកគ្រូ
     const API_URL = "https://script.google.com/macros/s/AKfycbzUBwkXT5pRfJfmwzi2_nCH7ndOxKYZ153j5A2ftcWCJ78awQu7Zdio8XuKZ7MFiWZE/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
