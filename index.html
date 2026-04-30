@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
+    
+    <!-- បន្ថែម SweetAlert2 សម្រាប់ផ្ទាំង Pop-up ស្អាតៗ -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* --- រក្សាសោភ័ណភាពចាស់របស់លោកគ្រូទាំងស្រុង --- */
         :root { 
             --sky-blue: #00a8ff;
             --deep-sky: #0097e6;
@@ -20,7 +23,6 @@
 
         body { 
             font-family: 'Kantumruy Pro', sans-serif; margin: 0;
-            background: #87CEEB;
             background: linear-gradient(135deg, #87CEEB 0%, #E0F7FA 100%);
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; overflow: hidden; position: relative;
@@ -79,6 +81,8 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        .staff-card:active { transform: scale(0.95); }
+
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
         .avatar {
@@ -91,7 +95,6 @@
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .info .name { font-weight: 700; color: #2d3436; font-size: 16px; }
         .info .role { font-size: 10px; color: var(--professional-blue); background: rgba(30, 55, 153, 0.08); padding: 2px 10px; border-radius: 10px; font-weight: 600; }
-        /* បន្ថែមស្ទីលសម្រាប់ភេទ */
         .info .gender-tag { font-size: 9px; color: #636e72; margin-left: 5px; font-weight: normal; }
 
         #status-bar {
@@ -135,7 +138,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbw42fe_0zqwXHgYDDcL6k8q7-UUwRfmVbqa5XVPiuzV49PDJzwgyxV4V_LAVTotQpgb/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
-    // បានបន្ថែមព័ត៌មាន "ភេទ" ទៅក្នុង staffData
     const staffData = [
         { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
         { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
@@ -162,7 +164,6 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.08}s`;
-        // បន្ថែមការបញ្ជូនតម្លៃ s.gender ទៅក្នុង function
         card.onclick = () => submitAttendance(s.name, s.role, s.gender);
         
         const photo = s.driveId 
@@ -184,49 +185,68 @@
         const lastCheck = localStorage.getItem('attendance_' + name);
 
         if (lastCheck === today) {
-            alert("❌ លោកគ្រូ/អ្នកគ្រូ " + name + " បានចុះវត្តមានសម្រាប់ថ្ងៃនេះរួចរាល់ហើយ!");
+            Swal.fire({
+                icon: 'warning',
+                title: 'វត្តមានរួចរាល់!',
+                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះវត្តមានថ្ងៃនេះរួចរាល់ហើយ!`,
+                confirmButtonText: 'យល់ព្រម',
+                confirmButtonColor: '#1e3799'
+            });
             return;
         }
 
-        const bar = document.getElementById('status-bar');
-        bar.style.display = "block";
-        bar.style.background = "white";
-        bar.style.color = "#333";
-        bar.innerHTML = "⏳ កំពុងផ្ទៀងផ្ទាត់ទីតាំង...";
+        // បង្ហាញ Loading ពេលកំពុងឆែកទីតាំង
+        Swal.fire({
+            title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
                 if (d <= 300) {
-                    bar.style.background = "#27ae60";
-                    bar.style.color = "white";
-                    bar.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុកទិន្នន័យ...";
-
                     fetch(API_URL, {
                         method: "POST",
                         mode: "no-cors",
                         body: JSON.stringify({ 
                             id: name, 
                             role: role, 
-                            gender: gender, // បញ្ជូនភេទទៅកាន់ Google Sheets
+                            gender: gender, 
                             latitude: pos.coords.latitude, 
                             longitude: pos.coords.longitude 
                         })
                     }).then(() => {
                         localStorage.setItem('attendance_' + name, today);
                         
-                        setTimeout(() => {
-                            alert("✅ ជោគជ័យ! " + name + " (" + role + ") បានចុះវត្តមានរួចរាល់។");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ជោគជ័យ!',
+                            text: `${name} (${role}) បានចុះវត្តមានរួចរាល់។`,
+                            timer: 2500,
+                            showConfirmButton: false
+                        }).then(() => {
                             location.reload();
-                        }, 500);
+                        });
                     });
                 } else {
-                    bar.style.background = "#e74c3c";
-                    bar.style.color = "white";
-                    bar.innerHTML = `❌ នៅឆ្ងាយពេក (${Math.round(d)}ម)`;
-                    setTimeout(() => bar.style.display = "none", 4000);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'បរាជ័យ!',
+                        text: `លោកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
+                        confirmButtonText: 'ព្យាយាមម្តងទៀត',
+                        confirmButtonColor: '#e74c3c'
+                    });
                 }
-            }, () => alert("សូមបើក GPS!"));
+            }, () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'បញ្ហា GPS',
+                    text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!',
+                });
+            });
         }
     }
 
