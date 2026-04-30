@@ -91,6 +91,8 @@
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .info .name { font-weight: 700; color: #2d3436; font-size: 16px; }
         .info .role { font-size: 10px; color: var(--professional-blue); background: rgba(30, 55, 153, 0.08); padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+        /* បន្ថែមស្ទីលសម្រាប់ភេទ */
+        .info .gender-tag { font-size: 9px; color: #636e72; margin-left: 5px; font-weight: normal; }
 
         #status-bar {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -133,24 +135,25 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbztiArO89QndoMsRUVe2aCJTd9kXwNxlUEBsjTiYTjhNImBOhPYwhFGAJAI2rxBDNvg/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
+    // បានបន្ថែមព័ត៌មាន "ភេទ" ទៅក្នុង staffData
     const staffData = [
-        { name: "គុំ សុខាន", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
-        { name: "សូ ធីម", role: "នាយករង", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
-        { name: "យ៉ាន សុភ័ក្រ្ត", role: "លេខាធិការ", driveId: "10HMqBSsPXY9oI-dUpOFooAGgZo7Km3CX" },
-        { name: "សំ ស្រីល័ក្ខណ៍", role: "បណ្ណារក្ស", driveId: "1Ab3662TvWv15emb4-Z3gD2zxPVHykhRb" },
-        { name: "មែ រុំ", role: "គ្រូក្រៅប្រព័ន្ធ", driveId: "1AdH-0CoI2Sl6MN4rlZ5zogpzr3aDuL3A" },
-        { name: "កូយ សៅឃី", role: "គ្រូឈរថ្នាក់", driveId: "1JEgGF3XtxqD8bHyMZAmkM4FJyk4HoLwW" },
-        { name: "គុច គួយ", role: "គ្រូឈរថ្នាក់", driveId: "10_WcjHyGON1c5FFeonlnp1Y6cjKuwwB9" },
-        { name: "ផុន នារតី", role: "គ្រូឈរថ្នាក់", driveId: "1siyfigfJcXczcUldJSCpBs4OiOXU5yDP" },
-        { name: "រស់ ស្រីណា", role: "គ្រូមត្តេយ្យ", driveId: "1jf2NFrPZzZ00SKhpH2wkPPR0Pu8_azL2" },
-        { name: "លីវ គីម", role: "គ្រូឈរថ្នាក់", driveId: "14nvjOJJhGUeGkA7JzAO_HZKNhdah_aAV" },
-        { name: "សាត សៅនឿន", role: "គ្រូឈរថ្នាក់", driveId: "1SFoOAZ-jxtr8qM457luoV5b5LHADJIzm" },
-        { name: "សុំ ណារីន", role: "គ្រូឈរថ្នាក់", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
-        { name: "ឡូ សេងទ្រី", role: "គ្រូមត្តេយ្យ", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
-        { name: "សូ សុជាតា", role: "គ្រូកិច្ចសន្យា", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
-        { name: "ជឿង សំភស្ស", role: "គ្រូកិច្ចសន្យា", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
-        { name: "ឈាវ សុខគុណ", role: "គ្រូកិច្ចសន្យា", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
-        { name: "ទ្រី មុនី", role: "គ្រូកិច្ចសន្យា", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
+        { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
+        { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
+        { name: "យ៉ាន សុភ័ក្រ្ត", gender: "ស្រី", role: "លេខាធិការ", driveId: "10HMqBSsPXY9oI-dUpOFooAGgZo7Km3CX" },
+        { name: "សំ ស្រីល័ក្ខណ៍", gender: "ស្រី", role: "បណ្ណារក្ស", driveId: "1Ab3662TvWv15emb4-Z3gD2zxPVHykhRb" },
+        { name: "មែ រុំ", gender: "ប្រុស", role: "គ្រូក្រៅប្រព័ន្ធ", driveId: "1AdH-0CoI2Sl6MN4rlZ5zogpzr3aDuL3A" },
+        { name: "កូយ សៅឃី", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", driveId: "1JEgGF3XtxqD8bHyMZAmkM4FJyk4HoLwW" },
+        { name: "គុច គួយ", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", driveId: "10_WcjHyGON1c5FFeonlnp1Y6cjKuwwB9" },
+        { name: "ផុន នារតី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1siyfigfJcXczcUldJSCpBs4OiOXU5yDP" },
+        { name: "រស់ ស្រីណា", gender: "ស្រី", role: "គ្រូមត្តេយ្យ", driveId: "1jf2NFrPZzZ00SKhpH2wkPPR0Pu8_azL2" },
+        { name: "លីវ គីម", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "14nvjOJJhGUeGkA7JzAO_HZKNhdah_aAV" },
+        { name: "សាត សៅនឿន", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", driveId: "1SFoOAZ-jxtr8qM457luoV5b5LHADJIzm" },
+        { name: "សុំ ណារីន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
+        { name: "ឡូ សេងទ្រី", gender: "ស្រី", role: "គ្រូមត្តេយ្យ", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
+        { name: "សូ សុជាតា", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
+        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
+        { name: "ឈាវ សុខគុណ", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
+        { name: "ទ្រី មុនី", gender: "ប្រុស", role: "គ្រូកិច្ចសន្យា", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
     ];
 
     const listDiv = document.getElementById('list');
@@ -159,7 +162,8 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.08}s`;
-        card.onclick = () => submitAttendance(s.name, s.role);
+        // បន្ថែមការបញ្ជូនតម្លៃ s.gender ទៅក្នុង function
+        card.onclick = () => submitAttendance(s.name, s.role, s.gender);
         
         const photo = s.driveId 
             ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}">` 
@@ -168,15 +172,14 @@
         card.innerHTML = `
             <div class="avatar">${photo}</div>
             <div class="info">
-                <div class="name">${s.name}</div>
+                <div class="name">${s.name}<span class="gender-tag">(${s.gender})</span></div>
                 <div class="role">${s.role}</div>
             </div>
         `;
         listDiv.appendChild(card);
     });
 
-    function submitAttendance(name, role) {
-        // --- បន្ថែមថ្មី៖ ឆែកមើលក្នុងទូរស័ព្ទថាបានចុះថ្ងៃនេះហើយឬនៅ ---
+    function submitAttendance(name, role, gender) {
         const today = new Date().toDateString();
         const lastCheck = localStorage.getItem('attendance_' + name);
 
@@ -197,7 +200,7 @@
                 if (d <= 300) {
                     bar.style.background = "#27ae60";
                     bar.style.color = "white";
-                    bar.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងផ្ទៀងផ្ទាត់ឈ្មោះស្ទួន...";
+                    bar.innerHTML = "✅ ទីតាំងត្រឹមត្រូវ! កំពុងរក្សាទុកទិន្នន័យ...";
 
                     fetch(API_URL, {
                         method: "POST",
@@ -205,11 +208,11 @@
                         body: JSON.stringify({ 
                             id: name, 
                             role: role, 
+                            gender: gender, // បញ្ជូនភេទទៅកាន់ Google Sheets
                             latitude: pos.coords.latitude, 
                             longitude: pos.coords.longitude 
                         })
                     }).then(() => {
-                        // --- បន្ថែមថ្មី៖ កត់ចំណាំទុកក្នុងទូរស័ព្ទបន្ទាប់ពីផ្ញើជោគជ័យ ---
                         localStorage.setItem('attendance_' + name, today);
                         
                         setTimeout(() => {
