@@ -182,6 +182,23 @@
 
     function submitAttendance(name, role, gender) {
         const today = new Date().toDateString();
+        
+        // --- ផ្នែកបន្ថែម៖ ការពារការចុះឈ្មោះជំនួសគ្នាលើឧបករណ៍តែមួយ ---
+        const deviceUsedDate = localStorage.getItem('global_device_used_date');
+        const deviceUserName = localStorage.getItem('global_device_user_name');
+
+        if (deviceUsedDate === today && deviceUserName !== name) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ឧបករណ៍ត្រូវបានប្រើរួចហើយ!',
+                text: `ទូរសព្ទនេះបានចុះវត្តមានឱ្យ "${deviceUserName}" រួចហើយសម្រាប់ថ្ងៃនេះ។ មិនអាចចុះឈ្មោះអ្នកផ្សេងបានទេ!`,
+                confirmButtonText: 'យល់ព្រម',
+                confirmButtonColor: '#e74c3c'
+            });
+            return;
+        }
+        // ---------------------------------------------------
+
         const lastCheck = localStorage.getItem('attendance_' + name);
 
         if (lastCheck === today) {
@@ -195,7 +212,6 @@
             return;
         }
 
-        // បង្ហាញ Loading ពេលកំពុងឆែកទីតាំង
         Swal.fire({
             title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
             allowOutsideClick: false,
@@ -219,7 +235,12 @@
                             longitude: pos.coords.longitude 
                         })
                     }).then(() => {
+                        // កត់ត្រាវត្តមានផ្ទាល់ខ្លួន
                         localStorage.setItem('attendance_' + name, today);
+                        
+                        // កត់ត្រាថា "ទូរសព្ទនេះត្រូវបានប្រើដោយនរណា" សម្រាប់ថ្ងៃនេះ
+                        localStorage.setItem('global_device_used_date', today);
+                        localStorage.setItem('global_device_user_name', name);
                         
                         Swal.fire({
                             icon: 'success',
