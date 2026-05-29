@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
     
-    <!-- បន្ថែម SweetAlert2 សម្រាប់ផ្ទាំង Pop-up ស្អាតៗ -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
@@ -103,6 +102,12 @@
             text-align: center; font-weight: bold; z-index: 1000;
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
+        
+        /* បន្ថែមរចនាប័ទ្មសម្រាប់ប៊ូតុងជ្រើសរើសប្រភេទវត្តមាន */
+        .swal2-styled.swal2-cancel {
+            background-color: #f39c12 !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +169,7 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.08}s`;
-        card.onclick = () => submitAttendance(s.name, s.role, s.gender);
+        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
         
         const photo = s.driveId 
             ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}">` 
@@ -180,7 +185,28 @@
         listDiv.appendChild(card);
     });
 
-    function submitAttendance(name, role, gender) {
+    // មុខងារថ្មីសម្រាប់ជ្រើសរើសប្រភេទវត្តមាន (ចូល ឬ ចេញ)
+    function selectAttendanceType(name, role, gender) {
+        Swal.fire({
+            title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
+            text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: false,
+            confirmButtonText: '<i class="fa fa-sign-in-alt"></i> ចូលវត្តមាន',
+            cancelButtonText: '<i class="fa fa-sign-out-alt"></i> ចេញវត្តមាន',
+            confirmButtonColor: '#1e3799',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                submitAttendance(name, role, gender, "ចូលវត្តមាន");
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                submitAttendance(name, role, gender, "ចេញវត្តមាន");
+            }
+        });
+    }
+
+    function submitAttendance(name, role, gender, attendanceType) {
         const today = new Date().toDateString();
         
         // --- ផ្នែកបន្ថែម៖ ការពារការចុះឈ្មោះជំនួសគ្នាលើឧបករណ៍តែមួយ ---
@@ -199,13 +225,14 @@
         }
         // ---------------------------------------------------
 
-        const lastCheck = localStorage.getItem('attendance_' + name);
+        // ប្តូរការឆែកមើលលក្ខខណ្ឌទៅតាមប្រភេទវត្តមាន (attendanceType) នីមួយៗ
+        const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
 
         if (lastCheck === today) {
             Swal.fire({
                 icon: 'warning',
                 title: 'វត្តមានរួចរាល់!',
-                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះវត្តមានថ្ងៃនេះរួចរាល់ហើយ!`,
+                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType}" ថ្ងៃនេះរួចរាល់ហើយ!`,
                 confirmButtonText: 'យល់ព្រម',
                 confirmButtonColor: '#1e3799'
             });
@@ -231,12 +258,13 @@
                             id: name, 
                             role: role, 
                             gender: gender, 
+                            type: attendanceType, // បញ្ជូនប្រភេទវត្តមាន (ចូលវត្តមាន ឬ ចេញវត្តមាន) ទៅកាន់ Sheets
                             latitude: pos.coords.latitude, 
                             longitude: pos.coords.longitude 
                         })
                     }).then(() => {
-                        // កត់ត្រាវត្តមានផ្ទាល់ខ្លួន
-                        localStorage.setItem('attendance_' + name, today);
+                        // កត់ត្រាវត្តមានផ្ទាល់ខ្លួនទៅតាមប្រភេទ
+                        localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
                         
                         // កត់ត្រាថា "ទូរសព្ទនេះត្រូវបានប្រើដោយនរណា" សម្រាប់ថ្ងៃនេះ
                         localStorage.setItem('global_device_used_date', today);
@@ -245,7 +273,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'ជោគជ័យ!',
-                            text: `${name} (${role}) បានចុះវត្តមានរួចរាល់។`,
+                            text: `${name} (${role}) បានគូស "${attendanceType}" រួចរាល់។`,
                             timer: 2500,
                             showConfirmButton: false
                         }).then(() => {
