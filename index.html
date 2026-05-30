@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://script.google.com/macros/s/AKfycby9pCW889__BiBT8NQchpSj2dXgnayFPpwv6OOvpiRXJDM1OCEBUzbSSE3rZKj9BX8q/exec">
     <style>
         :root { 
             --sky-blue: #00a8ff;
@@ -103,7 +102,6 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
         
-        /* បន្ថែមរចនាប័ទ្មសម្រាប់ប៊ូតុងជ្រើសរើសប្រភេទវត្តមាន */
         .swal2-styled.swal2-cancel {
             background-color: #f39c12 !important;
             color: white !important;
@@ -140,6 +138,7 @@
     }
     createDiamonds();
 
+    // បញ្ជាក់៖ ត្រង់នេះត្រូវប្រាកដថាជា Web URL ចុងក្រោយបង្អស់ដែលបានមកពីការ New Deployment ក្នុង Apps Script
     const API_URL = "https://script.google.com/macros/s/AKfycbw42fe_0zqwXHgYDDcL6k8q7-UUwRfmVbqa5XVPiuzV49PDJzwgyxV4V_LAVTotQpgb/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
@@ -185,17 +184,16 @@
         listDiv.appendChild(card);
     });
 
-    // មុខងារថ្មីសម្រាប់ជ្រើសរើសប្រភេទវត្តមាន (ចូល ឬ ចេញ)
     function selectAttendanceType(name, role, gender) {
         Swal.fire({
             title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
             text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
             icon: 'question',
             showCancelButton: true,
-            showDenyButton: false,
-            confirmButtonText: '<i class="fa fa-sign-in-alt"></i> ចូលវត្តមាន',
-            cancelButtonText: '<i class="fa fa-sign-out-alt"></i> ចេញវត្តមាន',
+            confirmButtonText: 'ចូលវត្តមាន',
+            cancelButtonText: 'ចេញវត្តមាន',
             confirmButtonColor: '#1e3799',
+            cancelButtonColor: '#f39c12',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
@@ -209,7 +207,6 @@
     function submitAttendance(name, role, gender, attendanceType) {
         const today = new Date().toDateString();
         
-        // --- ផ្នែកបន្ថែម៖ ការពារការចុះឈ្មោះជំនួសគ្នាលើឧបករណ៍តែមួយ ---
         const deviceUsedDate = localStorage.getItem('global_device_used_date');
         const deviceUserName = localStorage.getItem('global_device_user_name');
 
@@ -223,9 +220,7 @@
             });
             return;
         }
-        // ---------------------------------------------------
 
-        // ប្តូរការឆែកមើលលក្ខខណ្ឌទៅតាមប្រភេទវត្តមាន (attendanceType) នីមួយៗ
         const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
 
         if (lastCheck === today) {
@@ -242,31 +237,44 @@
         Swal.fire({
             title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
             allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+            didOpen: () => { Swal.showLoading(); }
         });
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
                 if (d <= 300) {
+                    
+                    // --- ផ្នែកកែសម្រួល៖ ប្ដូរឈ្មោះ Keys ឱ្យត្រូវជាមួយ Apps Script និងបើកទម្រង់ផ្ញើពេញលេញ ---
+                    const payload = {
+                        name: name,
+                        role: role,
+                        gender: gender,
+                        type: attendanceType,
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude
+                    };
+
                     fetch(API_URL, {
                         method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify({ 
-                            id: name, 
-                            role: role, 
-                            gender: gender, 
-                            type: attendanceType, // បញ្ជូនប្រភេទវត្តមាន (ចូលវត្តមាន ឬ ចេញវត្តមាន) ទៅកាន់ Sheets
-                            latitude: pos.coords.latitude, 
-                            longitude: pos.coords.longitude 
-                        })
-                    }).then(() => {
-                        // កត់ត្រាវត្តមានផ្ទាល់ខ្លួនទៅតាមប្រភេទ
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.text())
+                    .then(responseText => {
+                        // ពិនិត្យលទ្ធផលតបមកវិញពី Google Sheets
+                        if (responseText.includes("Already_Checked_In")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
+                            return;
+                        }
+                        if (responseText.includes("Already_Checked_Out")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចេញរួចហើយ!` });
+                            return;
+                        }
+
                         localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
-                        
-                        // កត់ត្រាថា "ទូរសព្ទនេះត្រូវបានប្រើដោយនរណា" សម្រាប់ថ្ងៃនេះ
                         localStorage.setItem('global_device_used_date', today);
                         localStorage.setItem('global_device_user_name', name);
                         
@@ -279,7 +287,11 @@
                         }).then(() => {
                             location.reload();
                         });
+                    })
+                    .catch(err => {
+                        Swal.fire({ icon: 'error', title: 'មានបញ្ហាប្រព័ន្ធ', text: 'មិនអាចទាក់ទងទៅកាន់ Google Sheets បានទេ៖ ' + err });
                     });
+
                 } else {
                     Swal.fire({
                         icon: 'error',
