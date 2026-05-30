@@ -3,253 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
-    
+    <title>ប្រព័ន្ធកត់ត្រាវត្តមានបុគ្គលិក</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;700&family=Moul&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --sky-blue: #00a8ff;
-            --deep-sky: #0097e6;
-            --soft-sky: #e1f5fe;
-            --professional-blue: #1e3799;
-            --gold-accent: #f1c40f;
+        body {
+            font-family: 'Khmer', sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-
-        * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Kantumruy Pro', sans-serif; margin: 0;
-            background: linear-gradient(135deg, #87CEEB 0%, #E0F7FA 100%);
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; overflow: hidden; position: relative;
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
         }
-
-        #diamond-container {
-            position: absolute; width: 100%; height: 100%;
-            top: 0; left: 0; z-index: 0; pointer-events: none;
+        h2 { color: #2c3e50; margin-bottom: 25px; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { font-weight: bold; color: #555; }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Khmer', sans-serif;
         }
-
-        .diamond-particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.4);
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            animation: diamondMove 15s infinite linear;
-            opacity: 0;
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
         }
-
-        @keyframes diamondMove {
-            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Khmer', sans-serif;
+            transition: 0.3s;
         }
-
-        .app-container {
-            width: 95%; max-width: 400px; height: 90vh;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px); border-radius: 40px;
-            border: 4px solid white; display: flex; flex-direction: column;
-            box-shadow: 0 25px 50px rgba(0, 168, 255, 0.2);
-            overflow: hidden; position: relative; z-index: 1;
-        }
-
-        .header { 
-            background: var(--deep-sky); padding: 25px 15px; text-align: center;
-            border-bottom: 4px solid var(--gold-accent); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .header h1 { font-family: 'Moul', cursive; font-size: 18px; margin: 0; color: #fff; }
-        .header p { color: rgba(255,255,255,0.9); font-size: 10px; margin-top: 8px; letter-spacing: 2px; font-weight: bold; }
-
-        .content { 
-            flex: 1; padding: 20px 15px; overflow-y: auto; 
-            background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png');
-        }
-
-        .staff-card {
-            background: white; border-radius: 15px; padding: 10px 15px; margin-bottom: 12px;
-            display: flex; align-items: center;
-            border: 1.5px solid var(--soft-sky);
-            border-left: 6px solid var(--professional-blue);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            cursor: pointer; opacity: 0; transform: translateY(20px);
-            animation: slideUp 0.6s ease forwards;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .staff-card:active { transform: scale(0.95); }
-
-        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-        .avatar {
-            width: 50px; height: 50px; border-radius: 12px; background: var(--soft-sky);
-            margin-right: 15px; overflow: hidden; display: flex; 
-            justify-content: center; align-items: center;
-            border: 1.5px solid var(--sky-blue); flex-shrink: 0;
-        }
-
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .info .name { font-weight: 700; color: #2d3436; font-size: 16px; }
-        .info .role { font-size: 10px; color: var(--professional-blue); background: rgba(30, 55, 153, 0.08); padding: 2px 10px; border-radius: 10px; font-weight: 600; }
-        .info .gender-tag { font-size: 9px; color: #636e72; margin-left: 5px; font-weight: normal; }
-
-        #status-bar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 80%; padding: 15px; border-radius: 25px; display: none;
-            text-align: center; font-weight: bold; z-index: 1000;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-        
-        .swal2-styled.swal2-cancel {
-            background-color: #f39c12 !important;
-            color: white !important;
-        }
+        .btn-in { background-color: #2ecc71; }
+        .btn-in:hover { background-color: #27ae60; }
+        .btn-out { background-color: #e74c3c; }
+        .btn-out:hover { background-color: #c0392b; }
     </style>
 </head>
 <body>
 
-<div id="diamond-container"></div>
-<div id="status-bar"></div>
-
-<div class="app-container">
-    <div class="header">
-        <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <p>SMART ATTENDANCE • SKY EDITION</p>
+<div class="card">
+    <h2>កត់ត្រាវត្តមានអនឡាញ</h2>
+    
+    <div class="form-group">
+        <label for="username">ឈ្មោះបុគ្គលិក</label>
+        <input type="text" id="username" placeholder="វាយឈ្មោះរបស់លោកគ្រូ/អ្នកគ្រូ">
     </div>
-    <div class="content" id="list"></div>
+
+    <div class="form-group">
+        <label for="gender">ភេទ</label>
+        <select id="gender">
+            <option value="ប្រុស">ប្រុស</option>
+            <option value="ស្រី">ស្រី</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="role">តួនាទី</label>
+        <input type="text" id="role" placeholder="ឧ. គ្រូបង្រៀន ឬ នាយករង">
+    </div>
+
+    <div class="btn-container">
+        <button class="btn-in" onclick="submitAttendance('ចូលវត្តមាន')">ចូលវត្តមាន</button>
+        <button class="btn-out" onclick="submitAttendance('ចេញវត្តមាន')">ចេញវត្តមាន</button>
+    </div>
 </div>
 
 <script>
-    function createDiamonds() {
-        const container = document.getElementById('diamond-container');
-        for (let i = 0; i < 25; i++) {
-            const diamond = document.createElement('div');
-            diamond.className = 'diamond-particle';
-            const size = Math.random() * 15 + 5;
-            diamond.style.width = `${size}px`;
-            diamond.style.height = `${size}px`;
-            diamond.style.left = `${Math.random() * 100}vw`;
-            diamond.style.animationDelay = `${Math.random() * 15}s`;
-            diamond.style.animationDuration = `${Math.random() * 10 + 10}s`;
-            container.appendChild(diamond);
-        }
-    }
-    createDiamonds();
+    // ⚠️ លោកគ្រូគ្រាន់តែយកលីង Web app ថ្មីមកដាក់ជំនួសត្រង់នេះ
+    const API_URL = "https://script.google.com/macros/s/AKfycby9pCW889__BiBT8NQchpSj2dXgnayFPpwv6OOvpiRXJDM1OCEBUzbSSE3rZKj9BX8q/exec"; 
 
-    // បញ្ជាក់៖ ត្រង់នេះត្រូវប្រាកដថាជា Web URL ចុងក្រោយបង្អស់ដែលបានមកពីការ New Deployment ក្នុង Apps Script
-    const API_URL = "https://script.google.com/macros/s/AKfycby9pCW889__BiBT8NQchpSj2dXgnayFPpwv6OOvpiRXJDM1OCEBUzbSSE3rZKj9BX8q/exec";
-    const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
+    function submitAttendance(attendanceType) {
+        const name = document.getElementById("username").value.trim();
+        const gender = document.getElementById("gender").value;
+        const role = document.getElementById("role").value.trim();
 
-    const staffData = [
-        { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
-        { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
-        { name: "យ៉ាន សុភ័ក្រ្ត", gender: "ប្រុស", role: "លេខាធិការ", driveId: "10HMqBSsPXY9oI-dUpOFooAGgZo7Km3CX" },
-        { name: "សំ ស្រីល័ក្ខណ៍", gender: "ស្រី", role: "បណ្ណារក្ស", driveId: "1Ab3662TvWv15emb4-Z3gD2zxPVHykhRb" },
-        { name: "មែ រុំ", gender: "ប្រុស", role: "គ្រូក្រៅប្រព័ន្ធ", driveId: "1AdH-0CoI2Sl6MN4rlZ5zogpzr3aDuL3A" },
-        { name: "កូយ សៅឃី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1JEgGF3XtxqD8bHyMZAmkM4FJyk4HoLwW" },
-        { name: "គុច គួយ", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", driveId: "10_WcjHyGON1c5FFeonlnp1Y6cjKuwwB9" },
-        { name: "ផុន នារតី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1siyfigfJcXczcUldJSCpBs4OiOXU5yDP" },
-        { name: "រស់ ស្រីណា", gender: "ស្រី", role: "គ្រូមត្តេយ្យ", driveId: "1jf2NFrPZzZ00SKhpH2wkPPR0Pu8_azL2" },
-        { name: "លីវ គីម", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", driveId: "14nvjOJJhGUeGkA7JzAO_HZKNhdah_aAV" },
-        { name: "សាត សៅនឿន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1SFoOAZ-jxtr8qM457luoV5b5LHADJIzm" },
-        { name: "សុំ ណារីន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
-        { name: "ឡូ សេងទ្រី", gender: "ប្រុស", role: "គ្រូមត្តេយ្យ", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
-        { name: "សូ សុជាតា", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
-        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
-        { name: "ឈាវ សុខគុណ", gender: "ប្រុស", role: "គ្រូកិច្ចសន្យា", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
-        { name: "ទ្រី មុនី", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
-    ];
-
-    const listDiv = document.getElementById('list');
-
-    staffData.forEach((s, i) => {
-        const card = document.createElement('div');
-        card.className = 'staff-card';
-        card.style.animationDelay = `${i * 0.08}s`;
-        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
-        
-        const photo = s.driveId 
-            ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}">` 
-            : `<span>${s.name.charAt(0)}</span>`;
-
-        card.innerHTML = `
-            <div class="avatar">${photo}</div>
-            <div class="info">
-                <div class="name">${s.name}<span class="gender-tag">(${s.gender})</span></div>
-                <div class="role">${s.role}</div>
-            </div>
-        `;
-        listDiv.appendChild(card);
-    });
-
-    function selectAttendanceType(name, role, gender) {
-        Swal.fire({
-            title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
-            text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'ចូលវត្តមាន',
-            cancelButtonText: 'ចេញវត្តមាន',
-            confirmButtonColor: '#1e3799',
-            cancelButtonColor: '#f39c12',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                submitAttendance(name, role, gender, "ចូលវត្តមាន");
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                submitAttendance(name, role, gender, "ចេញវត្តមាន");
-            }
-        });
-    }
-
-    function submitAttendance(name, role, gender, attendanceType) {
-        const today = new Date().toDateString();
-        
-        const deviceUsedDate = localStorage.getItem('global_device_used_date');
-        const deviceUserName = localStorage.getItem('global_device_user_name');
-
-        if (deviceUsedDate === today && deviceUserName !== name) {
-            Swal.fire({
-                icon: 'error',
-                title: 'សូមអធ្យាស្រ័យ!',
-                text: `លោកអ្នកបានចុះវត្តមានឱ្យ "${deviceUserName}" រួចហើយសម្រាប់ថ្ងៃនេះ។ មិនអាចចុះឈ្មោះអ្នកផ្សេងបានទេ!`,
-                confirmButtonText: 'យល់ព្រម',
-                confirmButtonColor: '#e74c3c'
-            });
-            return;
-        }
-
-        const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
-
-        if (lastCheck === today) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'វត្តមានរួចរាល់!',
-                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType}" ថ្ងៃនេះរួចរាល់ហើយ!`,
-                confirmButtonText: 'យល់ព្រម',
-                confirmButtonColor: '#1e3799'
-            });
+        if (!name || !role) {
+            Swal.fire({ icon: 'warning', title: 'មិនទាន់គ្រប់គ្រាន់', text: 'សូមបំពេញឈ្មោះ និងតួនាទីឱ្យបានត្រឹមត្រូវ!' });
             return;
         }
 
         Swal.fire({
-            title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
+            title: 'កំពុងស្វែងរកទីតាំង...',
+            text: 'សូមរង់ចាំមួយភ្លែត',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
-                if (d <= 300) {
-                    
-                    // --- ផ្នែកកែសម្រួល៖ ប្ដូរឈ្មោះ Keys ឱ្យត្រូវជាមួយ Apps Script និងបើកទម្រង់ផ្ញើពេញលេញ ---
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    // រៀបចំកញ្ចប់ទិន្នន័យបញ្ជូន (Payload Keys ត្រូវជាមួយ Apps Script)
                     const payload = {
                         name: name,
-                        role: role,
                         gender: gender,
+                        role: role,
                         type: attendanceType,
                         latitude: pos.coords.latitude,
                         longitude: pos.coords.longitude
@@ -257,67 +124,46 @@
 
                     fetch(API_URL, {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8"
-                        },
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
                         body: JSON.stringify(payload)
                     })
                     .then(res => res.text())
                     .then(responseText => {
-                        // ពិនិត្យលទ្ធផលតបមកវិញពី Google Sheets
-                        if (responseText.includes("Already_Checked_In")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
-                            return;
-                        }
-                        if (responseText.includes("Already_Checked_Out")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចេញរួចហើយ!` });
-                            return;
-                        }
-
-                        localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
-                        localStorage.setItem('global_device_used_date', today);
-                        localStorage.setItem('global_device_user_name', name);
+                        Swal.close();
                         
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'ជោគជ័យ!',
-                            text: `${name} (${role}) បានគូស "${attendanceType}" រួចរាល់។`,
-                            timer: 2500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            location.reload();
-                        });
+                        if (responseText.includes("Already_Checked_In")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់', text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះឈ្មោះ "ចូលវត្តមាន" រួចរាល់ហើយសម្រាប់ថ្ងៃនេះ!` });
+                        } 
+                        else if (responseText.includes("Already_Checked_Out")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់', text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះឈ្មោះ "ចេញវត្តមាន" រួចរាល់ហើយសម្រាប់ថ្ងៃនេះ!` });
+                        } 
+                        else if (responseText.includes("Success_In")) {
+                            Swal.fire({ icon: 'success', title: 'ជោគជ័យ', text: `បានកត់ត្រា "ចូលវត្តមាន" សម្រាប់ ${name} រួចរាល់!`, timer: 2500, showConfirmButton: false })
+                            .then(() => location.reload());
+                        } 
+                        else if (responseText.includes("Success_Out") || responseText.includes("Success_Out_Only")) {
+                            Swal.fire({ icon: 'success', title: 'ជោគជ័យ', text: `បានកត់ត្រា "ចេញវត្តមាន" សម្រាប់ ${name} រួចរាល់!`, timer: 2500, showConfirmButton: false })
+                            .then(() => location.reload());
+                        } 
+                        else {
+                            Swal.fire({ icon: 'error', title: 'បរាជ័យ', text: 'មានបញ្ហាមិនអាចរក្សាទុក៖ ' + responseText });
+                        }
                     })
                     .catch(err => {
-                        Swal.fire({ icon: 'error', title: 'មានបញ្ហាប្រព័ន្ធ', text: 'មិនអាចទាក់ទងទៅកាន់ Google Sheets បានទេ៖ ' + err });
+                        Swal.close();
+                        Swal.fire({ icon: 'error', title: 'មានបញ្ហាប្រព័ន្ធ', text: 'មិនអាចទាក់ទងទៅកាន់ Google Sheet បានទេ!' });
                     });
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'បរាជ័យ!',
-                        text: `លោកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
-                        confirmButtonText: 'ព្យាយាមម្តងទៀត',
-                        confirmButtonColor: '#e74c3c'
-                    });
+                },
+                (err) => {
+                    Swal.close();
+                    Swal.fire({ icon: 'error', title: 'ទីតាំងត្រូវបានបដិសេធ', text: 'សូមបើក Location/GPS នៅលើទូរសព្ទ ឬកម្មវិធីរុករក (Browser) របស់អ្នកសិន!' });
                 }
-            }, () => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'បញ្ហា GPS',
-                    text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!',
-                });
-            });
+            );
+        } else {
+            Swal.fire({ icon: 'error', title: 'មិនគាំទ្រ', text: 'កម្មវិធីរុករកនេះមិនគាំទ្រប្រព័ន្ធរកទីតាំង GPS ឡើយ។' });
         }
     }
-
-    function getDist(lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
 </script>
+
 </body>
 </html>
