@@ -70,7 +70,6 @@
             background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png');
         }
 
-        /* បង្កើត Grid ជាពីរជួរស្របគ្នាតាមរូបគំរូ */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -92,7 +91,7 @@
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
         .avatar {
-            width: 45px; height: 45px; border-radius: 50%; background: #f0f4f8;
+            width: 45px; height: 45px; border-radius: 50%; background: #e1f5fe;
             margin-right: 10px; overflow: hidden; display: flex; 
             justify-content: center; align-items: center;
             border: 2px solid #00a8ff; flex-shrink: 0;
@@ -101,11 +100,14 @@
 
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         
+        .avatar span {
+            font-size: 16px; font-weight: bold; color: var(--professional-blue);
+        }
+        
         .info { display: flex; flex-direction: column; gap: 2px; }
         .info .name { font-weight: 700; color: var(--text-dark); font-size: 13.5px; }
         .info .role { font-size: 10px; color: #7f8c8d; font-weight: 500; }
         
-        /* ប៊ូតុងតូចបង្ហាញស្ថានភាពខាងក្រោមឈ្មោះ */
         .status-badge {
             align-self: flex-start;
             font-size: 8px; color: white; background: #2ecc71; 
@@ -113,7 +115,6 @@
             margin-top: 2px;
         }
 
-        /* ចុចមូលតូចពណ៌ខៀវនៅជ្រុងខាងស្តាំខាងលើកាត */
         .dot-indicator {
             position: absolute; top: 8px; right: 8px;
             width: 6px; height: 6px; background-color: #00a8ff;
@@ -196,8 +197,9 @@
         card.style.animationDelay = `${i * 0.04}s`;
         card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
         
+        // កែសម្រួលតំណភ្ជាប់ទាញយករូបភាពពី Google Drive ឱ្យត្រូវតាមស្តង់ដាររួម
         const photo = s.driveId 
-            ? `<img src="https://lh3.googleusercontent.com/d/$${s.driveId}">` 
+            ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
             : `<span>${s.name.charAt(0)}</span>`;
 
         card.innerHTML = `
