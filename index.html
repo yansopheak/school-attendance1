@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>សាលាបឋមសិក្សាទួលលៀប</title>
-    <title>វត្តមានបុគ្គលិក</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;700&family=Moul&display=swap" rel="stylesheet">
@@ -47,7 +46,6 @@
             100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
         }
 
-        /* កែផ្ទៃកុងតេន័ររួមឱ្យឆ្លុះមើលឃើញទៅខាងក្រោយតិចៗ */
         .app-container {
             width: 95%; max-width: 410px; height: 92vh;
             background: rgba(255, 255, 255, 0.45);
@@ -66,7 +64,6 @@
         .header h1 { font-family: 'Moul', cursive; font-size: 15px; margin: 0; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .header p { color: #fff; font-size: 9px; margin: 6px 0 0 0; letter-spacing: 1px; font-weight: 700; opacity: 0.95; }
 
-        /* កែផ្ទៃខាងក្រោយនៃប្រអប់តារាងឱ្យទៅជាពណ៌ខៀវឆ្លុះមើលធ្លុះទៅក្រោយ */
         .content { 
             flex: 1; padding: 15px 12px; overflow-y: auto; 
             background: rgba(0, 151, 230, 0.25);
@@ -79,7 +76,6 @@
             gap: 10px;
         }
 
-        /* រក្សាទុកប្រអប់ឈ្មោះឱ្យនៅពណ៌សដដែល មិនឱ្យឆ្លុះតាមផ្ទៃក្រោយឡើយ */
         .staff-card {
             background: #ffffff !important;
             border-radius: 20px; padding: 10px;
@@ -113,7 +109,6 @@
         .info .name { font-weight: 700; color: var(--text-dark); font-size: 13.5px; }
         .info .role { font-size: 10px; color: #7f8c8d; font-weight: 500; }
         
-        /* កែពណ៌ Badge ឱ្យទៅជាពណ៌ខៀវដិតស្អាតសក្តិសមនឹងអត្តលេខមន្ត្រី */
         .status-badge {
             align-self: flex-start;
             font-size: 8px; color: white; background: #1e3799; 
@@ -134,15 +129,10 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
         
-        .swal2-styled.swal2-cancel {
-            background-color: #f39c12 !important;
-            color: white !important;
-        }
-        /* ប្ដូរពុម្ពអក្សរលើប៊ូតុងទាំងពីរក្នុងផ្ទាំងប្រកាសអាសន្ន */
         .swal2-popup .swal2-styled {
-            font-family: 'Khmer OS Siemreap', sans-serif !important;
-            font-weight: 500; /* កម្រាស់អក្សរ (៤០០ ល្មម, ៥០០ រាងដិតតិចៗ, ៧០០ ដិតខ្លាំង) */
-            font-size: 14px !important; /* ទំហំអក្សរលើប៊ូតុង */
+            font-family: 'Kantumruy Pro', sans-serif !important;
+            font-weight: 500;
+            font-size: 14px !important;
         }
     </style>
 </head>
@@ -179,10 +169,10 @@
     }
     createDiamonds();
 
+    // 🔗 លីង API Web App របស់លោកគ្រូ
     const API_URL = "https://script.google.com/macros/s/AKfycby9pCW889__BiBT8NQchpSj2dXgnayFPpwv6OOvpiRXJDM1OCEBUzbSSE3rZKj9BX8q/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
-    // បានបន្ថែមជម្រើស id (អត្តលេខមន្ត្រី) រួចរាល់
     const staffData = [
         { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", id: "1681500089", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
         { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", id: "1801500060", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
@@ -211,12 +201,11 @@
         card.style.animationDelay = `${i * 0.04}s`;
         card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
         
-        // កែសម្រួលតំណភ្ជាប់ទាញយករូបភាពពី Google Drive ឱ្យត្រូវតាមស្តង់ដាររួម
+        // ✅ បានជួសជុលត្រង់អក្សរ $ ដើម្បីបង្ហាញរូបភាពពី Google Drive ឱ្យដំណើរការធម្មតាវិញ
         const photo = s.driveId 
-            ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
+            ? `<img src="https://docs.google.com/uc?export=view&id=${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
             : `<span>${s.name.charAt(0)}</span>`;
 
-        // ប្តូរពីពាក្យ "ចូលរៀន" មកជា "អត្តលេខ" របស់បុគ្គលិកម្នាក់ៗ
         card.innerHTML = `
             <div class="dot-indicator"></div>
             <div class="avatar">${photo}</div>
@@ -265,19 +254,7 @@
             return;
         }
 
-        const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
-
-        if (lastCheck === today) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'វត្តមានរួចរាល់!',
-                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType}" ថ្ងៃនេះរួចរាល់ហើយ!`,
-                confirmButtonText: 'យល់ព្រម',
-                confirmButtonColor: '#1e3799'
-            });
-            return;
-        }
-
+        // 🔓 លុបចោលការចាក់សោរចាស់ចេញពី HTML ដើម្បីអនុញ្ញាតឱ្យបញ្ជូនទិន្នន័យដងទី ៣ និង ៤ ទៅ Sheets ពិនិត្យ
         Swal.fire({
             title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
             allowOutsideClick: false,
@@ -309,16 +286,20 @@
                     .then(responseText => {
                         Swal.close();
                         
-                        if (responseText.includes("Already_Checked_In")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
+                        // 🛑 បើកូដ Apps Script ឆ្លើយតបមកថាពេញលីមីត
+                        if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ")) {
+                            Swal.fire({ icon: 'error', title: 'ពេញកំណត់!', text: 'ឡីមីតនៃការស្កេនប្រចាំថ្ងៃរបស់លោកអ្នកបានពេញហើយ លុះត្រាតែថ្ងៃស្អែក!' });
                             return;
                         }
-                        if (responseText.includes("Already_Checked_Out")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចេញរួចហើយ!` });
+                        if (responseText.includes("Already_Checked_In")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ (សូមចុចចេញវិញ)!` });
+                            return;
+                        }
+                        if (responseText.includes("មិនអាចចុះចេញបានទេ")) {
+                            Swal.fire({ icon: 'warning', title: 'មិនអាចចុះចេញបានទេ!', text: responseText });
                             return;
                         }
 
-                        localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
                         localStorage.setItem('global_device_used_date', today);
                         localStorage.setItem('global_device_user_name', name);
                         
