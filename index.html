@@ -169,7 +169,6 @@
     }
     createDiamonds();
 
-    // 🔗 លីង API Web App របស់លោកគ្រូ
     const API_URL = "https://script.google.com/macros/s/AKfycby9pCW889__BiBT8NQchpSj2dXgnayFPpwv6OOvpiRXJDM1OCEBUzbSSE3rZKj9BX8q/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
@@ -199,9 +198,8 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
-        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
+        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id);
         
-        // ✅ បានជួសជុលត្រង់អក្សរ $ ដើម្បីបង្ហាញរូបភាពពី Google Drive ឱ្យដំណើរការធម្មតាវិញ
         const photo = s.driveId 
             ? `<img src="https://docs.google.com/uc?export=view&id=${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
             : `<span>${s.name.charAt(0)}</span>`;
@@ -218,7 +216,7 @@
         listDiv.appendChild(card);
     });
 
-    function selectAttendanceType(name, role, gender) {
+    function selectAttendanceType(name, role, gender, id) {
         Swal.fire({
             title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
             text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
@@ -230,20 +228,21 @@
             cancelButtonColor: '#f39c12',
         }).then((result) => {
             if (result.isConfirmed) {
-                submitAttendance(name, role, gender, "ចូលវត្តមាន");
+                submitAttendance(name, role, gender, id, "ចូលវត្តមាន");
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                submitAttendance(name, role, gender, "ចេញវត្តមាន");
+                submitAttendance(name, role, gender, id, "ចេញវត្តមាន");
             }
         });
     }
 
-    function submitAttendance(name, role, gender, attendanceType) {
+    function submitAttendance(name, role, gender, id, attendanceType) {
         const today = new Date().toDateString();
         
         const deviceUsedDate = localStorage.getItem('global_device_used_date');
-        const deviceUserName = localStorage.getItem('global_device_user_name');
+        const deviceUserId = localStorage.getItem('global_device_user_id');
 
-        if (deviceUsedDate === today && deviceUserName !== name) {
+        if (deviceUsedDate === today && deviceUserId !== id) {
+            const deviceUserName = localStorage.getItem('global_device_user_name') || "អ្នកផ្សេង";
             Swal.fire({
                 icon: 'error',
                 title: 'សូមអធ្យាស្រ័យ!',
@@ -254,7 +253,6 @@
             return;
         }
 
-        // 🔓 លុបចោលការចាក់សោរចាស់ចេញពី HTML ដើម្បីអនុញ្ញាតឱ្យបញ្ជូនទិន្នន័យដងទី ៣ និង ៤ ទៅ Sheets ពិនិត្យ
         Swal.fire({
             title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
             allowOutsideClick: false,
@@ -267,6 +265,7 @@
                 if (d <= 300) {
                     
                     const payload = {
+                        id: id,
                         name: name,
                         gender: gender,
                         role: role,
@@ -286,21 +285,17 @@
                     .then(responseText => {
                         Swal.close();
                         
-                        // 🛑 បើកូដ Apps Script ឆ្លើយតបមកថាពេញលីមីត
-                        if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ")) {
-                            Swal.fire({ icon: 'error', title: 'ពេញកំណត់!', text: 'ឡីមីតនៃការស្កេនប្រចាំថ្ងៃរបស់លោកអ្នកបានពេញហើយ លុះត្រាតែថ្ងៃស្អែក!' });
+                        if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ") || responseText.includes("មិនអាចចុះចេញបានទេ")) {
+                            Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
                             return;
                         }
                         if (responseText.includes("Already_Checked_In")) {
                             Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ (សូមចុចចេញវិញ)!` });
                             return;
                         }
-                        if (responseText.includes("មិនអាចចុះចេញបានទេ")) {
-                            Swal.fire({ icon: 'warning', title: 'មិនអាចចុះចេញបានទេ!', text: responseText });
-                            return;
-                        }
 
                         localStorage.setItem('global_device_used_date', today);
+                        localStorage.setItem('global_device_user_id', id);
                         localStorage.setItem('global_device_user_name', name);
                         
                         Swal.fire({
