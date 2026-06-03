@@ -139,6 +139,23 @@
             font-weight: 500;
             font-size: 14px !important;
         }
+
+        /* 👑 បន្ថែមរចនាបថផ្នែក Admin នៅខាងក្រោមបង្អស់ */
+        .admin-footer {
+            padding: 12px; background: rgba(255, 255, 255, 0.85);
+            text-align: center; border-top: 1px solid rgba(0, 168, 255, 0.2);
+        }
+        .admin-btn {
+            background: var(--professional-blue); color: white; border: none;
+            padding: 8px 20px; border-radius: 20px; font-family: 'Kantumruy Pro', sans-serif;
+            font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(30, 55, 153, 0.2);
+        }
+        .admin-btn:active { transform: scale(0.95); }
+        .swal-select {
+            width: 85%; padding: 10px; border-radius: 12px; border: 1px solid #ccc;
+            font-family: 'Kantumruy Pro', sans-serif; font-size: 14px; margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -154,6 +171,9 @@
     </div>
     <div class="content">
         <div class="grid-container" id="list"></div>
+    </div>
+    <div class="admin-footer">
+        <button class="admin-btn" onclick="loginAdmin()">🔑 គ្រប់គ្រងច្បាប់/អវត្តមាន</button>
     </div>
 </div>
 
@@ -176,6 +196,7 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbxY3XvpKqm8Pl3o-l3UD5lGLdeZtkegzQygPv6-t8JXpGS-A_m1T6hhK8eOsI3CZW7R/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
+    const ADMIN_PIN = "2026"; // 🔑 លេខកូដសម្ងាត់សម្រាប់ Admin
 
     const staffData = [
         { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", id: "1681500089", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
@@ -203,8 +224,11 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
+        
+        // 🔄 រក្សាទុកលក្ខខណ្ឌដើម៖ ចុចទៅបើកផ្ទាំងរើសវេនភ្លាមៗ (គ្មាន PIN ទេ)
         card.onclick = () => selectAttendanceShift(s.name, s.role, s.gender, s.id);
         
+        // 🔄 រក្សាទុកលីងរូបថត Google Drive ដើមរបស់លោកគ្រូដដែល
         const photo = s.driveId 
             ? '<img src="https://drive.google.com/thumbnail?sz=w200&id=' + s.driveId + '" onerror="this.src=\'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(s.name) + '\'">' 
             : '<span>' + s.name.charAt(0) + '</span>';
@@ -239,10 +263,10 @@
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 shift = "រសៀល";
             } else {
-                return; // ករណីចុចខ្វែងចោលមិនធ្វើអ្វីទាំងអស់
+                return; 
             }
 
-            // ជំហានទី២៖ ជ្រើសរើសប្រភេទ (ចូល ឬ ចេញ) ផ្អែកលើវេនដែលបានរើសរួច
+            // ជំហានទី២៖ ជ្រើសរើសប្រភេទ (ចូល ឬ ចេញ)
             Swal.fire({
                 title: `គូសវត្តមានវេន${shift}`,
                 text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
@@ -259,22 +283,70 @@
                 } else if (actionResult.dismiss === Swal.DismissReason.cancel) {
                     type = "ចេញវត្តមាន";
                 } else {
-                    return; // ករណីចុចខ្វែងចោល
+                    return; 
                 }
 
-                // បញ្ជូនទៅកាន់ប្រព័ន្ធផ្ទៀងផ្ទាត់ទីតាំង និងបញ្ជូនទិន្នន័យ
-                submitAttendance(name, role, gender, id, shift, type);
+                submitAttendance(name, role, gender, id, shift, type, false);
             });
         });
     }
 
-    function submitAttendance(name, role, gender, id, shift, attendanceType) {
+    // 🔑 មុខងារចូលប្រើប្រាស់ផ្នែក Admin
+    function loginAdmin() {
+        Swal.fire({
+            title: 'តំបន់គ្រប់គ្រង (Admin)',
+            text: 'សូមបញ្ចូលលេខកូដសម្ងាត់ Admin ដើម្បីបន្ត៖',
+            input: 'password',
+            inputAttributes: { maxlength: 4, inputmode: 'numeric', style: 'text-align: center;' },
+            showCancelButton: true, confirmButtonText: 'ចូលប្រព័ន្ធ', cancelButtonText: 'បោះបង់', confirmButtonColor: '#1e3799',
+            preConfirm: (inputPin) => {
+                if (inputPin !== ADMIN_PIN) { Swal.showValidationMessage('លេខកូដសម្ងាត់ Admin មិនត្រឹមត្រូវទេ!'); }
+                return inputPin;
+            }
+        }).then((result) => { if (result.isConfirmed) openAdminDashboard(); });
+    }
+
+    // 📊 បង្ហាញផ្ទាំងគ្រប់គ្រងច្បាប់/អវត្តមានសម្រាប់ Admin
+    function openAdminDashboard() {
+        let optionsHtml = staffData.map((s, idx) => `<option value="${idx}">${s.name} (${s.role})</option>`).join('');
+        
+        Swal.fire({
+            title: '✍️ កត់ត្រាច្បាប់ និងអវត្តមាន',
+            html: `
+                <div style="text-align: left; width: 85%; margin: auto;">
+                    <label><b>១. ជ្រើសរើសបុគ្គលិក៖</b></label><br>
+                    <select id="admin-staff" class="swal-select">${optionsHtml}</select><br><br>
+                    <label><b>២. ជ្រើសរើសវេនការងារ៖</b></label><br>
+                    <select id="admin-shift" class="swal-select">
+                        <option value="ព្រឹក">☀️ វេនព្រឹក</option>
+                        <option value="រសៀល">⛅ វេនរសៀល</option>
+                    </select><br><br>
+                    <label><b>៣. ជ្រើសរើសស្ថានភាព៖</b></label><br>
+                    <select id="admin-type" class="swal-select">
+                        <option value="សុំច្បាប់">🍁 សុំច្បាប់ (មានច្បាប់)</option>
+                        <option value="អវត្តមាន">❌ អវត្តមាន (ឥតច្បាប់)</option>
+                    </select>
+                </div>
+            `,
+            showCancelButton: true, confirmButtonText: 'រក្សាទុកទិន្នន័យ', cancelButtonText: 'បោះបង់', confirmButtonColor: '#27ae60',
+        }).then((res) => {
+            if (res.isConfirmed) {
+                const staffIdx = document.getElementById('admin-staff').value;
+                const shift = document.getElementById('admin-shift').value;
+                const type = document.getElementById('admin-type').value;
+                const selectedStaff = staffData[staffIdx];
+
+                submitAttendance(selectedStaff.name, selectedStaff.role, selectedStaff.gender, selectedStaff.id, shift, type, true);
+            }
+        });
+    }
+
+    function submitAttendance(name, role, gender, id, shift, attendanceType, isAdminMode) {
         const today = new Date().toDateString();
-        // បំបែកការចាំ LocalStorage តាមទម្រង់៖ ប្រភេទស្កេន + វេន + ឈ្មោះ ដើម្បីកុំឱ្យជាន់គ្នា
         const storageKey = 'attendance_' + attendanceType + '_' + shift + '_' + name;
         const lastCheck = localStorage.getItem(storageKey);
 
-        if (lastCheck === today) {
+        if (!isAdminMode && lastCheck === today) {
             Swal.fire({
                 icon: 'warning',
                 title: 'វត្តមានរួចរាល់!',
@@ -286,78 +358,87 @@
         }
 
         Swal.fire({
-            title: 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
+            title: isAdminMode ? 'កំពុងបញ្ជូនទិន្នន័យ Admin...' : 'កំពុងផ្ទៀងផ្ទាត់ទីតាំង...',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
-                if (d <= 300) {
-                    
-                    const payload = {
-                        id: id,
-                        name: name,
-                        gender: gender,
-                        role: role,
-                        shift: shift, // បញ្ជូនតម្លៃវេនទៅ Apps Script (Backend)
-                        type: attendanceType,
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude
-                    };
+        const sendPayload = (lat, lon) => {
+            const payload = {
+                id: id,
+                name: name,
+                gender: gender,
+                role: role,
+                shift: shift,
+                type: attendanceType,
+                latitude: lat,
+                longitude: lon
+            };
 
-                    fetch(API_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.text())
-                    .then(responseText => {
-                        Swal.close();
-                        
-                        if (responseText.includes("ឡីមីត") || responseText.includes("មិនអាចចុះ")) {
-                            Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
-                            return;
-                        }
-                        if (responseText.includes("Already_Checked")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} មានទិន្នន័យវេននេះរួចហើយនៅក្នុងប្រព័ន្ធ Sheets!` });
-                            return;
-                        }
+            fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(responseText => {
+                Swal.close();
+                
+                if (responseText.includes("ឡីមីត") || responseText.includes("មិនអាចចុះ")) {
+                    Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
+                    return;
+                }
+                if (responseText.includes("Already_Checked")) {
+                    Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} មានទិន្នន័យវេននេះរួចហើយនៅក្នុងប្រព័ន្ធ Sheets!` });
+                    return;
+                }
 
-                        localStorage.setItem(storageKey, today);
-                        
+                if (!isAdminMode) {
+                    localStorage.setItem(storageKey, today);
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ជោគជ័យ!',
+                    text: isAdminMode ? `បានកត់ត្រា "${attendanceType} វេន${shift}" សម្រាប់ ${name} រួចរាល់។` : `${name} (${role}) បានគូស "${attendanceType} វេន${shift}" រួចរាល់។`,
+                    timer: 2500,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            })
+            .catch(err => {
+                Swal.close();
+                Swal.fire({ icon: 'error', title: 'មានបញ្ហាប្រព័ន្ធ', text: 'មិនអាចទាក់ទងទៅកាន់ Google Sheets បានទេ៖ ' + err });
+            });
+        };
+
+        // 🚀 បើជា Admin បញ្ចូល គឺរំលងការឆែក GPS រីឯគ្រូៗធម្មតាត្រូវឆែក GPS
+        if (isAdminMode) {
+            sendPayload("", "");
+        } else {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
+                    if (d <= 300) {
+                        sendPayload(pos.coords.latitude, pos.coords.longitude);
+                    } else {
                         Swal.fire({
-                            icon: 'success',
-                            title: 'ជោគជ័យ!',
-                            text: `${name} (${role}) បានគូស "${attendanceType} វេន${shift}" រួចរាល់។`,
-                            timer: 2500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            location.reload();
+                            icon: 'error',
+                            title: 'សូមអភ័យទោស!',
+                            text: `លោកគ្រូ/អ្នកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
+                            confirmButtonText: 'ព្យាយាមម្តងទៀត',
+                            confirmButtonColor: '#e74c3c'
                         });
-                    })
-                    .catch(err => {
-                        Swal.close();
-                        Swal.fire({ icon: 'error', title: 'មានបញ្ហាប្រព័ន្ធ', text: 'មិនអាចទាក់ទងទៅកាន់ Google Sheets បានទេ៖ ' + err });
-                    });
-
-                } else {
+                    }
+                }, () => {
                     Swal.fire({
                         icon: 'error',
-                        title: 'សូមអភ័យទោស!',
-                        text: `លោកគ្រូ/អ្នកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
-                        confirmButtonText: 'ព្យាយាមម្តងទៀត',
-                        confirmButtonColor: '#e74c3c'
+                        title: 'បញ្ហា GPS',
+                        text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!',
                     });
-                }
-            }, () => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'បញ្ហា GPS',
-                    text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!',
                 });
-            });
+            }
         }
     }
 
