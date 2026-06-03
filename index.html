@@ -152,7 +152,7 @@
             box-shadow: 0 4px 10px rgba(30, 55, 153, 0.2);
         }
         .admin-btn:active { transform: scale(0.95); }
-        .swal-select {
+        .swal-select, .swal-input-custom {
             width: 85%; padding: 10px; border-radius: 12px; border: 1px solid #ccc;
             font-family: 'Kantumruy Pro', sans-serif; font-size: 14px; margin-top: 8px;
         }
@@ -194,6 +194,7 @@
     }
     createDiamonds();
 
+    // 🔄 រក្សាទុកតំណភ្ជាប់ API ដើមរបស់លោកគ្រូ
     const API_URL = "https://script.google.com/macros/s/AKfycbx5xCu9orDZ1zje70iWvVNCH6dO9Yw9r_WtVD69dj-dL9dpEcB0ljp32MpNg5YqYTGy/exec";
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
     const ADMIN_PIN = "2026"; // 🔑 លេខកូដសម្ងាត់សម្រាប់ Admin
@@ -225,10 +226,8 @@
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
         
-        // 🔄 រក្សាទុកលក្ខខណ្ឌដើម៖ ចុចទៅបើកផ្ទាំងរើសវេនភ្លាមៗ (គ្មាន PIN ទេ)
         card.onclick = () => selectAttendanceShift(s.name, s.role, s.gender, s.id);
         
-        // 🔄 រក្សាទុកលីងរូបថត Google Drive ដើមរបស់លោកគ្រូដដែល
         const photo = s.driveId 
             ? '<img src="https://drive.google.com/thumbnail?sz=w200&id=' + s.driveId + '" onerror="this.src=\'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(s.name) + '\'">' 
             : '<span>' + s.name.charAt(0) + '</span>';
@@ -246,7 +245,6 @@
     });
 
     function selectAttendanceShift(name, role, gender, id) {
-        // ជំហានទី១៖ ជ្រើសរើសវេន (ព្រឹក ឬ រសៀល)
         Swal.fire({
             title: `ជ្រើសរើសវេនការងារ`,
             text: `លោកគ្រូ/អ្នកគ្រូ៖ ${name} សូមជ្រើសរើសវេនវត្តមាន៖`,
@@ -258,15 +256,10 @@
             cancelButtonColor: '#f39c12',
         }).then((result) => {
             let shift = "";
-            if (result.isConfirmed) {
-                shift = "ព្រឹក";
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                shift = "រសៀល";
-            } else {
-                return; 
-            }
+            if (result.isConfirmed) { shift = "ព្រឹក"; } 
+            else if (result.dismiss === Swal.DismissReason.cancel) { shift = "រសៀល"; } 
+            else { return; }
 
-            // ជំហានទី២៖ ជ្រើសរើសប្រភេទ (ចូល ឬ ចេញ)
             Swal.fire({
                 title: `គូសវត្តមានវេន${shift}`,
                 text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
@@ -278,20 +271,16 @@
                 cancelButtonColor: '#f39c12',
             }).then((actionResult) => {
                 let type = "";
-                if (actionResult.isConfirmed) {
-                    type = "ចូលវត្តមាន";
-                } else if (actionResult.dismiss === Swal.DismissReason.cancel) {
-                    type = "ចេញវត្តមាន";
-                } else {
-                    return; 
-                }
+                if (actionResult.isConfirmed) { type = "ចូលវត្តមាន"; } 
+                else if (actionResult.dismiss === Swal.DismissReason.cancel) { type = "ចេញវត្តមាន"; } 
+                else { return; }
 
-                submitAttendance(name, role, gender, id, shift, type, false);
+                // ផ្ញើទិន្នន័យធម្មតា (reason ទំនេរគឺ "")
+                submitAttendance(name, role, gender, id, shift, type, "", false);
             });
         });
     }
 
-    // 🔑 មុខងារចូលប្រើប្រាស់ផ្នែក Admin
     function loginAdmin() {
         Swal.fire({
             title: 'តំបន់គ្រប់គ្រង (Admin)',
@@ -306,7 +295,6 @@
         }).then((result) => { if (result.isConfirmed) openAdminDashboard(); });
     }
 
-    // 📊 បង្ហាញផ្ទាំងគ្រប់គ្រងច្បាប់/អវត្តមានសម្រាប់ Admin
     function openAdminDashboard() {
         let optionsHtml = staffData.map((s, idx) => `<option value="${idx}">${s.name} (${s.role})</option>`).join('');
         
@@ -316,16 +304,21 @@
                 <div style="text-align: left; width: 85%; margin: auto;">
                     <label><b>១. ជ្រើសរើសបុគ្គលិក៖</b></label><br>
                     <select id="admin-staff" class="swal-select">${optionsHtml}</select><br><br>
+                    
                     <label><b>២. ជ្រើសរើសវេនការងារ៖</b></label><br>
                     <select id="admin-shift" class="swal-select">
                         <option value="ព្រឹក">☀️ វេនព្រឹក</option>
                         <option value="រសៀល">⛅ វេនរសៀល</option>
                     </select><br><br>
+                    
                     <label><b>៣. ជ្រើសរើសស្ថានភាព៖</b></label><br>
                     <select id="admin-type" class="swal-select">
                         <option value="សុំច្បាប់">🍁 សុំច្បាប់ (មានច្បាប់)</option>
                         <option value="អវត្តមាន">❌ អវត្តមាន (ឥតច្បាប់)</option>
-                    </select>
+                    </select><br><br>
+
+                    <label><b>៤. បញ្ជាក់មូលហេតុ (ឧទាហរណ៍៖ ឈឺ, ធុរៈ...)៖</b></label><br>
+                    <input type="text" id="admin-reason" class="swal-input-custom" placeholder="វាយបញ្ចូលមូលហេតុនៅទីនេះ..." style="width:100%; box-sizing:border-box;">
                 </div>
             `,
             showCancelButton: true, confirmButtonText: 'រក្សាទុកទិន្នន័យ', cancelButtonText: 'បោះបង់', confirmButtonColor: '#27ae60',
@@ -334,14 +327,21 @@
                 const staffIdx = document.getElementById('admin-staff').value;
                 const shift = document.getElementById('admin-shift').value;
                 const type = document.getElementById('admin-type').value;
-                const selectedStaff = staffData[staffIdx];
+                let reason = document.getElementById('admin-reason').value.trim();
+                
+                // បើមិនបានវាយមូលហេតុទេ វានឹងកំណត់តម្លៃលំនាំដើមស្វ័យប្រវត្តិតាមប្រភេទច្បាប់
+                if(!reason) {
+                    reason = (type === "សុំច្បាប់") ? "មានច្បាប់ត្រឹមត្រូវ" : "អវត្តមានឥតច្បាប់";
+                }
 
-                submitAttendance(selectedStaff.name, selectedStaff.role, selectedStaff.gender, selectedStaff.id, shift, type, true);
+                const selectedStaff = staffData[staffIdx];
+                // 🚀 បញ្ជូនតម្លៃ reason ទៅកាន់មុខងារ submitAttendance
+                submitAttendance(selectedStaff.name, selectedStaff.role, selectedStaff.gender, selectedStaff.id, shift, type, reason, true);
             }
         });
     }
 
-    function submitAttendance(name, role, gender, id, shift, attendanceType, isAdminMode) {
+    function submitAttendance(name, role, gender, id, shift, attendanceType, reason, isAdminMode) {
         const today = new Date().toDateString();
         const storageKey = 'attendance_' + attendanceType + '_' + shift + '_' + name;
         const lastCheck = localStorage.getItem(storageKey);
@@ -371,6 +371,7 @@
                 role: role,
                 shift: shift,
                 type: attendanceType,
+                reason: reason, // 🚀 ភ្ជាប់អថេរ reason បញ្ជូនទៅ Google Apps Script
                 latitude: lat,
                 longitude: lon
             };
@@ -393,9 +394,7 @@
                     return;
                 }
 
-                if (!isAdminMode) {
-                    localStorage.setItem(storageKey, today);
-                }
+                if (!isAdminMode) { localStorage.setItem(storageKey, today); }
                 
                 Swal.fire({
                     icon: 'success',
@@ -403,9 +402,7 @@
                     text: isAdminMode ? `បានកត់ត្រា "${attendanceType} វេន${shift}" សម្រាប់ ${name} រួចរាល់។` : `${name} (${role}) បានគូស "${attendanceType} វេន${shift}" រួចរាល់។`,
                     timer: 2500,
                     showConfirmButton: false
-                }).then(() => {
-                    location.reload();
-                });
+                }).then(() => { location.reload(); });
             })
             .catch(err => {
                 Swal.close();
@@ -413,30 +410,23 @@
             });
         };
 
-        // 🚀 បើជា Admin បញ្ចូល គឺរំលងការឆែក GPS រីឯគ្រូៗធម្មតាត្រូវឆែក GPS
-        if (isAdminMode) {
-            sendPayload("", "");
-        } else {
+        if (isAdminMode) { sendPayload("", ""); } 
+        else {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const d = getDist(pos.coords.latitude, pos.coords.longitude, SCHOOL_LOC.lat, SCHOOL_LOC.lon);
-                    if (d <= 300) {
-                        sendPayload(pos.coords.latitude, pos.coords.longitude);
-                    } else {
+                    if (d <= 300) { sendPayload(pos.coords.latitude, pos.coords.longitude); } 
+                    else {
                         Swal.fire({
                             icon: 'error',
                             title: 'សូមអភ័យទោស!',
-                            text: `លោកគ្រូ/អ្នកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
+                            text: `លោកគ្រូ/អ្នកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)۔`,
                             confirmButtonText: 'ព្យាយាមម្តងទៀត',
                             confirmButtonColor: '#e74c3c'
                         });
                     }
                 }, () => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'បញ្ហា GPS',
-                        text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!',
-                    });
+                    Swal.fire({ icon: 'error', title: 'បញ្ហា GPS', text: 'សូមបើកទីតាំង (Location) លើទូរស័ព្ទរបស់លោកគ្រូ!' });
                 });
             }
         }
