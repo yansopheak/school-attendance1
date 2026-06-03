@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>សាលាបឋមសិក្សាទួលលៀប</title>
-    <title>វត្តមានបុគ្គលិក</title>
+    <title>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;700&family=Moul&display=swap" rel="stylesheet">
@@ -47,6 +47,7 @@
             100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
         }
 
+        /* កែផ្ទៃកុងតេន័ររួមឱ្យឆ្លុះមើលឃើញទៅខាងក្រោយតិចៗ */
         .app-container {
             width: 95%; max-width: 410px; height: 92vh;
             background: rgba(255, 255, 255, 0.45);
@@ -65,6 +66,7 @@
         .header h1 { font-family: 'Moul', cursive; font-size: 15px; margin: 0; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .header p { color: #fff; font-size: 9px; margin: 6px 0 0 0; letter-spacing: 1px; font-weight: 700; opacity: 0.95; }
 
+        /* កែផ្ទៃខាងក្រោយនៃប្រអប់តារាងឱ្យទៅជាពណ៌ខៀវឆ្លុះមើលធ្លុះទៅក្រោយ */
         .content { 
             flex: 1; padding: 15px 12px; overflow-y: auto; 
             background: rgba(0, 151, 230, 0.25);
@@ -77,6 +79,7 @@
             gap: 10px;
         }
 
+        /* រក្សាទុកប្រអប់ឈ្មោះឱ្យនៅពណ៌សដដែល មិនឱ្យឆ្លុះតាមផ្ទៃក្រោយឡើយ */
         .staff-card {
             background: #ffffff !important;
             border-radius: 20px; padding: 10px;
@@ -110,6 +113,7 @@
         .info .name { font-weight: 700; color: var(--text-dark); font-size: 13.5px; }
         .info .role { font-size: 10px; color: #7f8c8d; font-weight: 500; }
         
+        /* ពណ៌ផ្ទាំង Badge បង្ហាញអត្តលេខមន្ត្រី */
         .status-badge {
             align-self: flex-start;
             font-size: 8px; color: white; background: #1e3799; 
@@ -134,10 +138,11 @@
             background-color: #f39c12 !important;
             color: white !important;
         }
+        /* ប្ដូរពុម្ពអក្សរលើប៊ូតុងទាំងពីរក្នុងផ្ទាំងប្រកាសអាសន្ន */
         .swal2-popup .swal2-styled {
-            font-family: 'Khmer OS Siemreap', sans-serif !important;
-            font-weight: 500;
-            font-size: 14px !important;
+        font-family: 'Kantumruy Pro', sans-serif !important;
+        font-weight: 500; /* កម្រាស់អក្សរ (៤០០ ល្មម, ៥០០ រាងដិតតិចៗ, ៧០០ ដិតខ្លាំង) */
+        font-size: 14px !important; /* ទំហំអក្សរលើប៊ូតុង */
         }
     </style>
 </head>
@@ -148,9 +153,8 @@
 
 <div class="app-container">
     <div class="header">
-        <h1>សាលាបឋមសិក្សាទួលលៀប</h1>
-        <h1>វត្តមានបុគ្គលិក</h1>
-        <p>STAFF ATTENDANCE • TUOLLIEB PRIMARY SCHOOL</p>
+        <h1>ប្រព័ន្ធវត្តមានឌីជីថល - សាលាបឋមសិក្សាទួលលៀប</h1>
+        <p>SMART ATTENDANCE • SKY EDITION</p>
     </div>
     <div class="content">
         <div class="grid-container" id="list"></div>
@@ -178,23 +182,23 @@
     const SCHOOL_LOC = { lat: 12.6988, lon: 103.7499 };
 
     const staffData = [
-        { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", id: "1681500089", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
-        { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", id: "1801500060", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
-        { name: "យ៉ាន សុភ័ក្រ្ត", gender: "ប្រុស", role: "លេខាធិការ", id: "1961500010", driveId: "10HMqBSsPXY9oI-dUpOFooAGgZo7Km3CX" },
-        { name: "សំ ស្រីល័ក្ខណ៍", gender: "ស្រី", role: "បណ្ណារក្ស", id: "2942400001", driveId: "1Ab3662TvWv15emb4-Z3gD2zxPVHykhRb" },
-        { name: "មែ រុំ", gender: "ប្រុស", role: "គ្រូក្រៅប្រព័ន្ធ", id: "1901500002", driveId: "1AdH-0CoI2Sl6MN4rlZ5zogpzr3aDuL3A" },
-        { name: "កូយ សៅឃី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "2991500013", driveId: "1JEgGF3XtxqD8bHyMZAmkM4FJyk4HoLwW" },
-        { name: "គុច គួយ", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", id: "1761500071", driveId: "10_WcjHyGON1c5FFeonlnp1Y6cjKuwwB9" },
-        { name: "ផុន នារតី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "2001500036", driveId: "1siyfigfJcXczcUldJSCpBs4OiOXU5yDP" },
-        { name: "រស់ ស្រីណា", gender: "ស្រី", role: "គ្រូមត្តេយ្យ", id: "2971500044", driveId: "1jf2NFrPZzZ00SKhpH2wkPPR0Pu8_azL2" },
-        { name: "លីវ គីម", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", id: "1871500048", driveId: "14nvjOJJhGUeGkA7JzAO_HZKNhdah_aAV" },
-        { name: "សាត សៅនឿន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "2931500022", driveId: "1SFoOAZ-jxtr8qM457luoV5b5LHADJIzm" },
-        { name: "សុំ ណារីន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "2001500058", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
-        { name: "ឡូ សេងទ្រី", gender: "ប្រុស", role: "គ្រូមត្តេយ្យ", id: "1011500021", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
-        { name: "សូ សុជាតា", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160587855", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
-        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160489585", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
-        { name: "ឈាវ សុខគុណ", gender: "ប្រុស", role: "គ្រូកិច្ចសន្យា", id: "160382012", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
-        { name: "ទ្រី មុនី", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160549640", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
+        { name: "គុំ សុខាន", gender: "ប្រុស", role: "នាយក", id: "00101", driveId: "1_f1XQBBK1WpeQPdZRgTLjrGW51TkVEi-" },
+        { name: "សូ ធីម", gender: "ប្រុស", role: "នាយករង", id: "00102", driveId: "1Ss4TqvmE-yCEeJ9somBj0nhwq4zmhn6s" },
+        { name: "យ៉ាន សុភ័ក្រ្ត", gender: "ប្រុស", role: "លេខាធិការ", id: "00103", driveId: "10HMqBSsPXY9oI-dUpOFooAGgZo7Km3CX" },
+        { name: "សំ ស្រីល័ក្ខណ៍", gender: "ស្រី", role: "បណ្ណារក្ស", id: "00104", driveId: "1Ab3662TvWv15emb4-Z3gD2zxPVHykhRb" },
+        { name: "មែ រុំ", gender: "ប្រុស", role: "គ្រូក្រៅប្រព័ន្ធ", id: "00105", driveId: "1AdH-0CoI2Sl6MN4rlZ5zogpzr3aDuL3A" },
+        { name: "កូយ សៅឃី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "00106", driveId: "1JEgGF3XtxqD8bHyMZAmkM4FJyk4HoLwW" },
+        { name: "គុច គួយ", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", id: "00107", driveId: "10_WcjHyGON1c5FFeonlnp1Y6cjKuwwB9" },
+        { name: "ផុន នារតី", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "00108", driveId: "1siyfigfJcXczcUldJSCpBs4OiOXU5yDP" },
+        { name: "រស់ ស្រីណា", gender: "ស្រី", role: "គ្រូមត្តេយ្យ", id: "00109", driveId: "1jf2NFrPZzZ00SKhpH2wkPPR0Pu8_azL2" },
+        { name: "លីវ គីម", gender: "ប្រុស", role: "គ្រូឈរថ្នាក់", id: "00110", driveId: "14nvjOJJhGUeGkA7JzAO_HZKNhdah_aAV" },
+        { name: "សាត សៅនឿន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "00111", driveId: "1SFoOAZ-jxtr8qM457luoV5b5LHADJIzm" },
+        { name: "សុំ ណារីន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "00112", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
+        { name: "ឡូ សេងទ្រី", gender: "ប្រុស", role: "គ្រូមត្តេយ្យ", id: "00113", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
+        { name: "សូ សុជាតា", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "00114", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
+        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "00115", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
+        { name: "ឈាវ សុខគុណ", gender: "ប្រុស", role: "គ្រូកិច្ចសន្យា", id: "00116", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
+        { name: "ទ្រី មុនី", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "00117", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
     ];
 
     const listDiv = document.getElementById('list');
@@ -203,11 +207,10 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
-        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id);
+        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender);
         
-        // 🔄 បានកែសម្រួលលីងរូបភាពទៅជាទម្រង់ត្រឹមត្រូវ (Direct Link របស់ Google Drive)
         const photo = s.driveId 
-            ? `<img src="https://drive.google.com/uc?export=view&id=${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
+            ? `<img src="https://lh3.googleusercontent.com/d/${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
             : `<span>${s.name.charAt(0)}</span>`;
 
         card.innerHTML = `
@@ -222,7 +225,7 @@
         listDiv.appendChild(card);
     });
 
-    function selectAttendanceType(name, role, gender, id) {
+    function selectAttendanceType(name, role, gender) {
         Swal.fire({
             title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
             text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
@@ -232,17 +235,33 @@
             cancelButtonText: 'ចេញវត្តមាន',
             confirmButtonColor: '#1e3799',
             cancelButtonColor: '#f39c12',
+            // បានដក reverseButtons: true ចេញដើម្បីឱ្យប៊ូតុង "ចូលវត្តមាន" រត់មកខាងឆ្វេង និង "ចេញវត្តមាន" ទៅខាងស្តាំវិញ
         }).then((result) => {
             if (result.isConfirmed) {
-                submitAttendance(name, role, gender, id, "ចូលវត្តមាន");
+                submitAttendance(name, role, gender, "ចូលវត្តមាន");
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                submitAttendance(name, role, gender, id, "ចេញវត្តមាន");
+                submitAttendance(name, role, gender, "ចេញវត្តមាន");
             }
         });
     }
 
-    function submitAttendance(name, role, gender, id, attendanceType) {
+    function submitAttendance(name, role, gender, attendanceType) {
         const today = new Date().toDateString();
+        
+        const deviceUsedDate = localStorage.getItem('global_device_used_date');
+        const deviceUserName = localStorage.getItem('global_device_user_name');
+
+        if (deviceUsedDate === today && deviceUserName !== name) {
+            Swal.fire({
+                icon: 'error',
+                title: 'សូមអធ្យាស្រ័យ!',
+                text: `លោកអ្នកបានចុះវត្តមានឱ្យ "${deviceUserName}" រួចហើយសម្រាប់ថ្ងៃនេះ Bowen។ មិនអាចចុះឈ្មោះអ្នកផ្សេងបានទេ!`,
+                confirmButtonText: 'យល់ព្រម',
+                confirmButtonColor: '#e74c3c'
+            });
+            return;
+        }
+
         const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
 
         if (lastCheck === today) {
@@ -268,7 +287,6 @@
                 if (d <= 300) {
                     
                     const payload = {
-                        id: id,
                         name: name,
                         gender: gender,
                         role: role,
@@ -279,17 +297,15 @@
 
                     fetch(API_URL, {
                         method: "POST",
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
                         body: JSON.stringify(payload)
                     })
                     .then(res => res.text())
                     .then(responseText => {
                         Swal.close();
                         
-                        if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ") || responseText.includes("មិនអាចចុះចេញបានទេ")) {
-                            Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
-                            return;
-                        }
                         if (responseText.includes("Already_Checked_In")) {
                             Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
                             return;
@@ -300,6 +316,8 @@
                         }
 
                         localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
+                        localStorage.setItem('global_device_used_date', today);
+                        localStorage.setItem('global_device_user_name', name);
                         
                         Swal.fire({
                             icon: 'success',
@@ -319,8 +337,8 @@
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'សូមអភ័យទោស!',
-                        text: `លោកគ្រូ/អ្នកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)។`,
+                        title: 'បរាជ័យ!',
+                        text: `លោកគ្រូនៅឆ្ងាយពីសាលាពេក (${Math.round(d)}ម)。`,
                         confirmButtonText: 'ព្យាយាមម្តងទៀត',
                         confirmButtonColor: '#e74c3c'
                     });
