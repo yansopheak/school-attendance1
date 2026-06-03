@@ -203,9 +203,8 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
-        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id);
+        card.onclick = () => selectAttendanceShift(s.name, s.role, s.gender, s.id);
         
-        // 🔄 កែសម្រួលតែត្រង់ចំណុចលីងនេះមួយគត់ដើម្បីឱ្យរូបភាពដំណើរការបានល្អឡើងវិញ (ទម្រង់បែបបទក្រៅពីនេះរក្សាទុកដដែល)
         const photo = s.driveId 
             ? '<img src="https://drive.google.com/thumbnail?sz=w200&id=' + s.driveId + '" onerror="this.src=\'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(s.name) + '\'">' 
             : '<span>' + s.name.charAt(0) + '</span>';
@@ -222,34 +221,64 @@
         listDiv.appendChild(card);
     });
 
-    function selectAttendanceType(name, role, gender, id) {
+    function selectAttendanceShift(name, role, gender, id) {
+        // ជំហានទី១៖ ជ្រើសរើសវេន (ព្រឹក ឬ រសៀល)
         Swal.fire({
-            title: `ជម្រើសវត្តមានសម្រាប់ថ្ងៃនេះ`,
-            text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
+            title: `ជ្រើសរើសវេនការងារ`,
+            text: `លោកគ្រូ/អ្នកគ្រូ៖ ${name} សូមជ្រើសរើសវេនវត្តមាន៖`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'ចូលវត្តមាន',
-            cancelButtonText: 'ចេញវត្តមាន',
-            confirmButtonColor: '#1e3799',
+            confirmButtonText: '☀️ វេនព្រឹក',
+            cancelButtonText: '⛅ វេនរសៀល',
+            confirmButtonColor: '#00a8ff',
             cancelButtonColor: '#f39c12',
         }).then((result) => {
+            let shift = "";
             if (result.isConfirmed) {
-                submitAttendance(name, role, gender, id, "ចូលវត្តមាន");
+                shift = "ព្រឹក";
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                submitAttendance(name, role, gender, id, "ចេញវត្តមាន");
+                shift = "រសៀល";
+            } else {
+                return; // ករណីចុចខ្វែងចោលមិនធ្វើអ្វីទាំងអស់
             }
+
+            // ជំហានទី២៖ ជ្រើសរើសប្រភេទ (ចូល ឬ ចេញ) ផ្អែកលើវេនដែលបានរើសរួច
+            Swal.fire({
+                title: `គូសវត្តមានវេន${shift}`,
+                text: `សូមជ្រើសរើសប្រភេទវត្តមានរបស់លោកគ្រូ/អ្នកគ្រូ៖ ${name}`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'ចូលវត្តមាន',
+                cancelButtonText: 'ចេញវត្តមាន',
+                confirmButtonColor: '#1e3799',
+                cancelButtonColor: '#f39c12',
+            }).then((actionResult) => {
+                let type = "";
+                if (actionResult.isConfirmed) {
+                    type = "ចូលវត្តមាន";
+                } else if (actionResult.dismiss === Swal.DismissReason.cancel) {
+                    type = "ចេញវត្តមាន";
+                } else {
+                    return; // ករណីចុចខ្វែងចោល
+                }
+
+                // បញ្ជូនទៅកាន់ប្រព័ន្ធផ្ទៀងផ្ទាត់ទីតាំង និងបញ្ជូនទិន្នន័យ
+                submitAttendance(name, role, gender, id, shift, type);
+            });
         });
     }
 
-    function submitAttendance(name, role, gender, id, attendanceType) {
+    function submitAttendance(name, role, gender, id, shift, attendanceType) {
         const today = new Date().toDateString();
-        const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
+        // បំបែកការចាំ LocalStorage តាមទម្រង់៖ ប្រភេទស្កេន + វេន + ឈ្មោះ ដើម្បីកុំឱ្យជាន់គ្នា
+        const storageKey = 'attendance_' + attendanceType + '_' + shift + '_' + name;
+        const lastCheck = localStorage.getItem(storageKey);
 
         if (lastCheck === today) {
             Swal.fire({
                 icon: 'warning',
                 title: 'វត្តមានរួចរាល់!',
-                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType}" ថ្ងៃនេះរួចរាល់ហើយ!`,
+                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType} វេន${shift}" ថ្ងៃនេះរួចរាល់ហើយ!`,
                 confirmButtonText: 'យល់ព្រម',
                 confirmButtonColor: '#1e3799'
             });
@@ -272,6 +301,7 @@
                         name: name,
                         gender: gender,
                         role: role,
+                        shift: shift, // បញ្ជូនតម្លៃវេនទៅ Apps Script (Backend)
                         type: attendanceType,
                         latitude: pos.coords.latitude,
                         longitude: pos.coords.longitude
@@ -286,25 +316,21 @@
                     .then(responseText => {
                         Swal.close();
                         
-                        if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ") || responseText.includes("មិនអាចចុះចេញបានទេ")) {
+                        if (responseText.includes("ឡីមីត") || responseText.includes("មិនអាចចុះ")) {
                             Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
                             return;
                         }
-                        if (responseText.includes("Already_Checked_In")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
-                            return;
-                        }
-                        if (responseText.includes("Already_Checked_Out")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចេញរួចហើយ!` });
+                        if (responseText.includes("Already_Checked")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} មានទិន្នន័យវេននេះរួចហើយនៅក្នុងប្រព័ន្ធ Sheets!` });
                             return;
                         }
 
-                        localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
+                        localStorage.setItem(storageKey, today);
                         
                         Swal.fire({
                             icon: 'success',
                             title: 'ជោគជ័យ!',
-                            text: `${name} (${role}) បានគូស "${attendanceType}" រួចរាល់។`,
+                            text: `${name} (${role}) បានគូស "${attendanceType} វេន${shift}" រួចរាល់។`,
                             timer: 2500,
                             showConfirmButton: false
                         }).then(() => {
