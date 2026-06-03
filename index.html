@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>សាលាបឋមសិក្សាទួលលៀប</title>
+    <title>វត្តមានបុគ្គលិក</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;700&family=Moul&display=swap" rel="stylesheet">
@@ -129,8 +130,12 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
         
+        .swal2-styled.swal2-cancel {
+            background-color: #f39c12 !important;
+            color: white !important;
+        }
         .swal2-popup .swal2-styled {
-            font-family: 'Kantumruy Pro', sans-serif !important;
+            font-family: 'Khmer OS Siemreap', sans-serif !important;
             font-weight: 500;
             font-size: 14px !important;
         }
@@ -198,10 +203,11 @@
         const card = document.createElement('div');
         card.className = 'staff-card';
         card.style.animationDelay = `${i * 0.04}s`;
-        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id);
+        card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id); // ផ្ញើ id ទៅជាមួយ
         
+        // រក្សាលីងរូបភាពដើមរបស់លោកគ្រូ
         const photo = s.driveId 
-            ? `<img src="https://docs.google.com/uc?export=view&id=${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
+            ? `<img src="http://googleusercontent.com/profile/picture/${s.driveId}" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(s.name)}'">` 
             : `<span>${s.name.charAt(0)}</span>`;
 
         card.innerHTML = `
@@ -238,17 +244,16 @@
     function submitAttendance(name, role, gender, id, attendanceType) {
         const today = new Date().toDateString();
         
-        const deviceUsedDate = localStorage.getItem('global_device_used_date');
-        const deviceUserId = localStorage.getItem('global_device_user_id');
+        // កែសម្រួលការផ្ទៀងផ្ទាត់ឧបករណ៍ ដោយដកលក្ខខណ្ឌដែលនាំឱ្យស្កេនបានតែម្តងចេញ
+        const lastCheck = localStorage.getItem('attendance_' + attendanceType + '_' + name);
 
-        if (deviceUsedDate === today && deviceUserId !== id) {
-            const deviceUserName = localStorage.getItem('global_device_user_name') || "អ្នកផ្សេង";
+        if (lastCheck === today) {
             Swal.fire({
-                icon: 'error',
-                title: 'សូមអធ្យាស្រ័យ!',
-                text: `លោកអ្នកបានចុះវត្តមានឱ្យ "${deviceUserName}" រួចហើយសម្រាប់ថ្ងៃនេះ។ អ្នកមិនអាចចុះឈ្មោះអ្នកផ្សេងបានទេ!`,
+                icon: 'warning',
+                title: 'វត្តមានរួចរាល់!',
+                text: `លោកគ្រូ/អ្នកគ្រូ ${name} បានចុះ "${attendanceType}" ថ្ងៃនេះរួចរាល់ហើយ!`,
                 confirmButtonText: 'យល់ព្រម',
-                confirmButtonColor: '#e74c3c'
+                confirmButtonColor: '#1e3799'
             });
             return;
         }
@@ -265,7 +270,7 @@
                 if (d <= 300) {
                     
                     const payload = {
-                        id: id,
+                        id: id,     // បញ្ជូន ID ទៅកាន់ Google Sheets តាមតម្រូវការប្រព័ន្ធថ្មី
                         name: name,
                         gender: gender,
                         role: role,
@@ -285,18 +290,21 @@
                     .then(responseText => {
                         Swal.close();
                         
+                        // 🔒 ពិនិត្យកូដឆ្លើយតបពី Apps Script
                         if (responseText.includes("ឡីមីតនៃការស្កេនប្រចាំថ្ងៃ") || responseText.includes("មិនអាចចុះចេញបានទេ")) {
                             Swal.fire({ icon: 'error', title: 'មិនអាចចុះឈ្មោះបាន!', text: responseText });
                             return;
                         }
                         if (responseText.includes("Already_Checked_In")) {
-                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ (សូមចុចចេញវិញ)!` });
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចូលរួចហើយ!` });
+                            return;
+                        }
+                        if (responseText.includes("Already_Checked_Out")) {
+                            Swal.fire({ icon: 'warning', title: 'វត្តមានរួចរាល់!', text: `លោកគ្រូ/អ្នកគ្រូ ${name} ធ្លាប់បានចុះឈ្មោះចេញរួចហើយ!` });
                             return;
                         }
 
-                        localStorage.setItem('global_device_used_date', today);
-                        localStorage.setItem('global_device_user_id', id);
-                        localStorage.setItem('global_device_user_name', name);
+                        localStorage.setItem('attendance_' + attendanceType + '_' + name, today);
                         
                         Swal.fire({
                             icon: 'success',
