@@ -192,7 +192,7 @@
         { name: "សុំ ណារីន", gender: "ស្រី", role: "គ្រូឈរថ្នាក់", id: "2001500058", driveId: "1DlBQdVQZHuss77h2eSsSxI5vYT227OkU" },
         { name: "ឡូ សេងទ្រី", gender: "ប្រុស", role: "គ្រូមត្តេយ្យ", id: "1011500021", driveId: "1xb4bd4-FcwdbLYRdXn9uNHF1z7oXONw6" },
         { name: "សូ សុជាតា", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160587855", driveId: "1P9Zg37vnZN0kWgT0aJJ_IX4e9JBBG-oD" },
-        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160489585", driveId: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
+        { name: "ជឿង សំភស្ស", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160489585", border: "1DtRmEj-_1781egLfo-kWGRie-tfNHstz" },
         { name: "ឈាវ សុខគុណ", gender: "ប្រុស", role: "គ្រូកិច្ចសន្យា", id: "160382012", driveId: "1FwperxCTCmxn6i5oH3ShiDw8UhMeyic_" },
         { name: "ទ្រី មុនី", gender: "ស្រី", role: "គ្រូកិច្ចសន្យា", id: "160549640", driveId: "1rb25ikHlFFDPJ7X92QynSXJyhMu4v6qd" }
     ];
@@ -205,9 +205,9 @@
         card.style.animationDelay = `${i * 0.04}s`;
         card.onclick = () => selectAttendanceType(s.name, s.role, s.gender, s.id);
         
-        // 🔄 បានកែសម្រួលលីងរូបភាពទៅជាទម្រង់ចាស់ដែលដើរល្អបំផុតរបស់លោកគ្រូវិញ
+        // 🔄 កែសម្រួលតែត្រង់ចំណុចលីងនេះមួយគត់ដើម្បីឱ្យរូបភាពដំណើរការបានល្អឡើងវិញ (ទម្រង់បែបបទក្រៅពីនេះរក្សាទុកដដែល)
         const photo = s.driveId 
-            ? '<img src="http://googleusercontent.com/profile/picture/' + s.driveId + '" onerror="this.src=\'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(s.name) + '\'">' 
+            ? '<img src="https://drive.google.com/thumbnail?sz=w200&id=' + s.driveId + '" onerror="this.src=\'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(s.name) + '\'">' 
             : '<span>' + s.name.charAt(0) + '</span>';
 
         card.innerHTML = `
